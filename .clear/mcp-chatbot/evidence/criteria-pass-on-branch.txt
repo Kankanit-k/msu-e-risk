@@ -1,0 +1,31 @@
+PASS  SC1 session has no secrets
+PASS  SC3 401 + resource_metadata
+PASS  R1 discovery metadata
+PASS  SC7 bad redirect rejected
+PASS  SC7 allowlisted redirect registered
+PASS  SC7 PKCE required at authorize
+PASS  CSRF consent POST from other origin → 403
+PASS  SC7 authorize → consent → code
+PASS  SC7 wrong verifier → invalid_grant
+PASS  SC7 code single use (burnt after failure)
+PASS  SC7 token issued with expiry
+PASS  SC7 code single use (after success)
+PASS  SC4 tools/list (read+write grant)
+PASS  SC8-lite whoami over MCP
+PASS  SC4/A6 read-only grant hides save_note
+PASS  SC4 calling hidden tool by name fails
+PASS  SC5 write returns confirm link, not executed
+PASS  SC5 other user cannot confirm
+PASS  SC5 cross-origin confirm blocked
+PASS  SC5 bearer (model) cannot confirm
+PASS  SC5 owner confirms → executed
+PASS  SC5 confirm is single use
+PASS  SC7 refresh rotates
+PASS  E2 old refresh reuse → invalid_grant
+PASS  E2 reuse revoked the whole grant
+PASS  grants list is per user
+PASS  SC7 revoked connection → 401
+PASS  SC9 no key → configured:false + 503
+PASS  chat needs login (401, no redirect)
+
+29/29 passed

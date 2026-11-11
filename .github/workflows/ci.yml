@@ -1,0 +1,60 @@
+name: CI
+
+on:
+  pull_request:
+  push:
+    branches: [main]
+
+concurrency:
+  group: ci-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  check:
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+
+    # Dummy values only — CI never talks to ERP, and the smoke tests mint their own session.
+    env:
+      NEXTAUTH_SECRET: ci-dummy-secret-not-used-anywhere-real
+      AUTH_DISABLED: 'false'
+      NEXT_PUBLIC_AUTH_DISABLED: 'false'
+      LOG_ENABLED: 'false'
+      DISCORD_WEBHOOK_ENABLED: 'false'
+
+    steps:
+      - uses: actions/checkout@v4
+
+      # Version comes from "packageManager" in package.json.
+      - uses: pnpm/action-setup@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: pnpm
+
+      - run: pnpm install --frozen-lockfile
+
+      - name: Typecheck
+        run: pnpm exec tsc --noEmit
+
+      - run: pnpm lint
+
+      - name: Build
+        run: pnpm build
+        env:
+          # Inlined at build time; the smoke server runs with the same demo mode (playwright.config.ts).
+          NEXT_PUBLIC_DEMO_MODE: 'true'
+
+      - name: Install Playwright browser
+        run: pnpm exec playwright install --with-deps chromium
+
+      - name: Smoke tests (next start)
+        run: pnpm test:smoke
+
+      - uses: actions/upload-artifact@v4
+        if: failure()
+        with:
+          name: playwright-traces
+          path: test-results/
+          retention-days: 7

@@ -1,0 +1,5 @@
+FAIL  SC1 session has no secrets  ← <!DOCTYPE html><html><head><meta charSet="utf-8" data-next-head=""/><meta name="viewport" content="width=device-width" d
+FAIL  SC3 401 + resource_metadata  ← 500 null
+FAIL  run aborted (remaining checks not reached)  ← Unexpected token '<', "<!DOCTYPE "... is not valid JSON
+
+0/3 passed

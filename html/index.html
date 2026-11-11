@@ -1,0 +1,298 @@
+<!doctype html>
+<html lang="th" data-theme="light">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<!-- Title is set from CONFIG below: "<page> | MSU-<ABBR>" -->
+<title>MSU-E-RISK</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Sarabun:wght@400;500;600;700&family=Manrope:wght@600;800&family=IBM+Plex+Sans+Thai:wght@600;700&display=swap" rel="stylesheet">
+<link href="https://cdn.jsdelivr.net/npm/remixicon@4.3.0/fonts/remixicon.css" rel="stylesheet">
+<style>
+:root{
+  --primary:#6D4CFF;--primary-soft:rgba(109,76,255,.12);
+  --bg:#F4F5FA;--paper:#fff;--text:#2E263D;--text2:#6D6777;--divider:#E6E5E8;
+  --hover:rgba(46,38,61,.06);--selected:rgba(46,38,61,.10);
+  --shadow:0 3px 6px rgba(46,38,61,.12);
+  --nav:260px;--rail:68px;--topbar:64px;
+  --font:'Sarabun',sans-serif;--font-head:'Manrope','IBM Plex Sans Thai',sans-serif;
+}
+[data-theme="dark"]{
+  --bg:#28243D;--paper:#312D4B;--text:#E7E3FC;--text2:#B6B1CC;--divider:#474360;
+  --hover:rgba(231,227,252,.06);--selected:rgba(231,227,252,.10);--shadow:0 3px 6px rgba(0,0,0,.3);
+}
+*{box-sizing:border-box}
+body{margin:0;font-family:var(--font);background:var(--bg);color:var(--text);font-size:15px}
+button{font:inherit;color:inherit;background:none;border:0;cursor:pointer;text-align:start}
+a{color:inherit;text-decoration:none}
+
+/* ── Sidebar ── */
+.nav{position:fixed;inset-block:0;inset-inline-start:0;inline-size:var(--nav);background:var(--paper);
+  border-inline-end:1px solid var(--divider);box-shadow:4px 0 16px -10px rgba(15,23,42,.1);
+  display:flex;flex-direction:column;z-index:20;transition:inline-size .25s,transform .25s}
+.brand{display:flex;align-items:center;gap:10px;padding:20px 16px 20px 22px}
+.brand-logo{inline-size:52px;block-size:52px;flex-shrink:0;padding:5px;border-radius:12px;background:#fff;
+  box-shadow:0 0 0 1px rgba(15,23,42,.06);display:grid;place-items:center}
+.brand-logo img{block-size:42px}
+.brand-text{display:flex;flex-direction:column;min-inline-size:0;flex:1}
+.brand-over{font-size:.625rem;font-weight:600;letter-spacing:.06em;text-transform:uppercase;color:var(--text2);white-space:nowrap}
+.brand-name{font-family:var(--font-head);font-size:1.375rem;font-weight:800;letter-spacing:-.02em;line-height:1.2;white-space:nowrap}
+.brand-sub{font-size:.75rem;color:var(--text2);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.pin{color:var(--text2);font-size:1.25rem}
+
+.menu{flex:1;overflow-y:auto;padding:4px 16px 8px 0;margin:0;list-style:none}
+.menu ul{list-style:none;margin:0;padding:0;overflow:hidden}
+.item,.group-btn{display:flex;align-items:center;gap:10px;inline-size:100%;margin-block-start:6px;
+  padding:8px 14px 8px 22px;border-start-end-radius:50px;border-end-end-radius:50px;white-space:nowrap}
+.item:hover,.group-btn:hover{background:var(--hover)}
+.group-btn i:first-child,.item>i{font-size:1.375rem}
+.group-btn .chev{margin-inline-start:auto;transition:transform .2s}
+.group.open>.group-btn{background:var(--selected)}
+.group.open>.group-btn .chev{transform:rotate(90deg)}
+.group:not(.open)>ul{display:none}
+.group ul .item{padding-inline-start:30px}
+.group ul .item>i{font-size:.75rem;color:var(--text2)}
+.item.active{background:var(--primary-soft);color:var(--primary);font-weight:600}
+.item.active>i{color:var(--primary)}
+.label{flex:1;overflow:hidden;text-overflow:ellipsis}
+.chip{font-size:.7rem;padding:1px 8px;border-radius:12px;border:1px solid #56CA00;color:#56CA00}
+
+.nav-foot{border-block-start:1px solid var(--divider);padding:12px 16px;font-size:.75rem}
+.nav-foot h6{margin:0 0 8px;font-size:.625rem;letter-spacing:.1em;text-transform:uppercase;color:var(--primary)}
+.dev{display:flex;gap:8px;align-items:center;margin-block-end:6px}
+.dev span:first-child{inline-size:26px;block-size:26px;border-radius:6px;background:var(--primary-soft);display:grid;place-items:center}
+
+/* Icon-only rail (desktop, pinned off) — expands on hover */
+body.rail .nav:not(:hover){inline-size:var(--rail)}
+body.rail .nav:not(:hover) :is(.brand-text,.pin,.label,.chip,.chev,.nav-foot){display:none}
+body.rail .nav:not(:hover) .group>ul{display:none}
+body.rail .nav:not(:hover) .brand{padding-inline:8px}
+body.rail .nav:not(:hover) .brand-logo{inline-size:48px;block-size:48px}
+body.rail .nav:not(:hover) .menu{padding-inline-end:8px}
+body.rail .nav:not(:hover) :is(.item,.group-btn){padding-inline-start:22px}
+
+/* ── Main ── */
+.main{margin-inline-start:var(--nav);min-block-size:100vh;display:flex;flex-direction:column;transition:margin .25s}
+body.rail .main{margin-inline-start:var(--rail)}
+.topbar{position:sticky;top:0;z-index:10;block-size:var(--topbar);display:flex;align-items:center;gap:8px;
+  padding-inline:24px;background:color-mix(in srgb,var(--bg) 85%,transparent);backdrop-filter:blur(6px)}
+.icon-btn{inline-size:38px;block-size:38px;border-radius:50%;display:grid;place-items:center;font-size:1.3rem}
+.icon-btn:hover{background:var(--hover)}
+.burger{display:none}
+.spacer{flex:1}
+.avatar{inline-size:38px;block-size:38px;border-radius:50%;background:var(--primary-soft);color:var(--primary);
+  display:grid;place-items:center;font-weight:700;position:relative}
+.avatar::after{content:'';position:absolute;inset-block-end:0;inset-inline-end:0;inline-size:9px;block-size:9px;border-radius:50%;
+  background:#56CA00;box-shadow:0 0 0 2px var(--paper)}
+.profile{position:relative}
+.dropdown{position:absolute;inset-inline-end:0;top:calc(100% + 10px);min-inline-size:240px;background:var(--paper);
+  border-radius:8px;box-shadow:0 6px 16px rgba(46,38,61,.22);padding:8px 0;display:none}
+.dropdown.open{display:block}
+.dd-head{display:flex;gap:10px;align-items:center;padding:8px 16px}
+.dd-head small{display:block;color:var(--text2)}
+.dd-sep{block-size:1px;background:var(--divider);margin:6px 0}
+.dd-label{font-size:.75rem;color:var(--primary);padding:4px 16px}
+.dd-item{display:flex;align-items:center;gap:12px;inline-size:100%;padding:8px 16px;text-align:start}
+.dd-item:hover{background:var(--hover)}
+.dd-item.selected{background:var(--primary-soft)}
+.dd-item .ri-check-line{margin-inline-start:auto;color:var(--primary)}
+.logout{margin:8px 16px 4px;inline-size:calc(100% - 32px);padding:6px;border-radius:6px;background:#FF4C51;color:#fff;font-weight:600}
+
+.content{flex:1;padding:24px;max-inline-size:1440px;inline-size:100%;margin-inline:auto}
+.card{background:var(--paper);border-radius:10px;box-shadow:var(--shadow);padding:24px}
+.card h1{font-family:var(--font-head);font-size:1.25rem;margin:0 0 4px}
+.card p{color:var(--text2);margin:0}
+footer{padding:16px 24px;text-align:center;color:var(--text2);font-size:.85rem}
+
+.backdrop{display:none;position:fixed;inset:0;background:rgba(0,0,0,.4);z-index:15}
+
+/* ── Mobile: sidebar becomes a drawer ── */
+@media (max-width:1199px){
+  .nav{transform:translateX(-100%);inline-size:var(--nav)!important}
+  body.drawer .nav{transform:none}
+  body.drawer .backdrop{display:block}
+  .main,body.rail .main{margin-inline-start:0}
+  .pin{display:none}
+  .burger{display:grid}
+  body.rail .nav :is(.brand-text,.label,.chip,.chev,.nav-foot){display:revert}
+  .topbar,.content{padding-inline:16px}
+}
+</style>
+</head>
+<body>
+
+<aside class="nav" id="nav">
+  <div class="brand">
+    <a href="#" class="brand-logo"><img src="msu-crest.png" alt="MSU"></a>
+    <div class="brand-text">
+      <span class="brand-over" data-cfg="overline"></span>
+      <span class="brand-name" data-cfg="name"></span>
+      <span class="brand-sub" data-cfg="subtitle"></span>
+    </div>
+    <button class="pin" id="pin" title="ย่อ/ขยายแถบเมนู" aria-label="ย่อ/ขยายแถบเมนู"><i class="ri-radio-button-line"></i></button>
+  </div>
+  <ul class="menu" id="menu"></ul>
+  <div class="nav-foot">
+    <h6>ผู้พัฒนาระบบ</h6>
+    <div class="dev"><span>👩</span><div><b>นางสาว######</b><br><small>กระบวนการ</small></div></div>
+    <div class="dev"><span>👨</span><div><b>นาย#######</b><br><small>ระบบ</small></div></div>
+  </div>
+</aside>
+<div class="backdrop" id="backdrop"></div>
+
+<div class="main">
+  <header class="topbar">
+    <button class="icon-btn burger" id="burger" aria-label="เปิดเมนู"><i class="ri-menu-line"></i></button>
+    <button class="icon-btn" id="mode" aria-label="สลับโหมดสว่าง/มืด"><i class="ri-sun-line"></i></button>
+    <div class="spacer"></div>
+    <div class="profile">
+      <button class="avatar" id="avatar" aria-haspopup="menu" aria-expanded="false">ผ</button>
+      <div class="dropdown" id="dropdown" role="menu">
+        <div class="dd-head"><span class="avatar">ผ</span><div><b>ชื่อ นามสกุล</b><small>หน่วยงาน</small></div></div>
+        <div class="dd-sep"></div>
+        <div class="dd-label">มุมมองสิทธิ์</div>
+        <div id="roles"></div>
+        <div class="dd-sep"></div>
+        <button class="dd-item" role="menuitem"><i class="ri-user-3-line"></i>โปรไฟล์</button>
+        <button class="dd-item" role="menuitem"><i class="ri-settings-4-line"></i>ตั้งค่า</button>
+        <button class="logout">ออกจากระบบ <i class="ri-logout-box-r-line"></i></button>
+      </div>
+    </div>
+  </header>
+
+  <main class="content">
+    <div class="card">
+      <h1 id="page-title"></h1>
+      <p>เนื้อหาของหน้า… (HTML version — ไฟล์เดียว ไม่ต้อง build)</p>
+    </div>
+  </main>
+  <footer>© <span id="year"></span> มหาวิทยาลัยมหาสารคาม</footer>
+</div>
+
+<script>
+/* ════ CONFIG — rename the system here first (same rule as themeConfig.ts) ════
+   name     : MSU-<ABBR>  (uppercase English abbreviation, e.g. MSU-CAR)
+   subtitle : full Thai system name (e.g. ระบบขอใช้รถ มมส)
+   Tab title becomes "<page> | MSU-<ABBR>". */
+const CONFIG = {
+  overline: 'Mahasarakham University',
+  name: 'MSU-E-RISK',            // ⚠️ rename
+  subtitle: 'ระบบบริหารความเสี่ยง มมส' // ⚠️ rename
+}
+
+// Sidebar menu — single source of truth. minRole hides a group below that tier (visibility only).
+const MENU = [
+  { label: 'แดชบอร์ด', icon: 'ri-dashboard-line', children: [
+    { label: 'หน้าหลัก', href: '#home', icon: 'ri-home-smile-line' },
+    { label: 'CRM', href: '#crm', icon: 'ri-line-chart-line' },
+    { label: 'Analytics', href: '#analytics', icon: 'ri-bar-chart-box-line', public: true }
+  ]},
+  { label: 'ตาราง', icon: 'ri-table-2', children: [
+    { label: 'ผู้ใช้งาน', href: '#users', icon: 'ri-table-line', public: true }
+  ]},
+  { label: 'ผู้ดูแลหน่วยงาน', icon: 'ri-shield-user-line', minRole: 'deptAdmin', children: [
+    { label: 'จัดการผู้ใช้', href: '#admin-users', icon: 'ri-shield-user-line' }
+  ]},
+  { label: 'ผู้ดูแลมหาวิทยาลัย', icon: 'ri-government-line', minRole: 'universityAdmin', children: [
+    { label: 'จัดการหน่วยงาน', href: '#admin-units', icon: 'ri-government-line' }
+  ]},
+  { label: 'อื่น ๆ', icon: 'ri-more-line', children: [
+    { label: 'เกี่ยวกับเรา', href: '#about', icon: 'ri-information-line' }
+  ]}
+]
+
+const ROLES = [
+  { value: 'user', label: 'ผู้ใช้ทั่วไป', icon: 'ri-user-line' },
+  { value: 'deptAdmin', label: 'ผู้ดูแลหน่วยงาน', icon: 'ri-shield-user-line' },
+  { value: 'universityAdmin', label: 'ผู้ดูแลมหาวิทยาลัย', icon: 'ri-government-line' }
+]
+const RANK = { user: 0, deptAdmin: 1, universityAdmin: 2 }
+
+// Per-viewer preferences; storage may be blocked (private mode) → fall back to defaults
+const store = {
+  get: (k, d) => { try { return JSON.parse(localStorage.getItem(k)) ?? d } catch { return d } },
+  set: (k, v) => { try { localStorage.setItem(k, JSON.stringify(v)) } catch {} }
+}
+const state = {
+  role: store.get('app-view-role', 'user'),
+  closed: store.get('sidebar-closed-groups', []),
+  rail: store.get('sidebar-rail', false),
+  theme: store.get('theme', 'light')
+}
+
+const $ = s => document.querySelector(s)
+const esc = s => String(s).replace(/[&<>"]/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' })[c])
+
+document.querySelectorAll('[data-cfg]').forEach(el => { el.textContent = CONFIG[el.dataset.cfg] })
+$('#year').textContent = new Date().getFullYear() + 543
+
+function currentItem() {
+  const all = MENU.flatMap(g => g.children)
+  return all.find(i => i.href === location.hash) || all[0]
+}
+
+function renderMenu() {
+  const active = currentItem()
+  $('#menu').innerHTML = MENU
+    .filter(g => RANK[state.role] >= RANK[g.minRole || 'user'])
+    .map(g => {
+      const hasActive = g.children.includes(active)
+      const open = hasActive || !state.closed.includes(g.label)
+      return `<li class="group${open ? ' open' : ''}" data-group="${esc(g.label)}">
+        <button class="group-btn" aria-expanded="${open}"><i class="${g.icon}"></i><span class="label">${esc(g.label)}</span><i class="ri-arrow-right-s-line chev"></i></button>
+        <ul>${g.children.map(i => `<li><a class="item${i === active ? ' active' : ''}" href="${i.href}">
+          <i class="ri-circle-line"></i><span class="label">${esc(i.label)}</span>${i.public ? '<span class="chip">สาธารณะ</span>' : ''}</a></li>`).join('')}</ul>
+      </li>`
+    }).join('')
+  $('#page-title').textContent = active.label
+  document.title = `${active.label} | ${CONFIG.name}`
+}
+
+$('#menu').addEventListener('click', e => {
+  const btn = e.target.closest('.group-btn')
+  if (btn) {
+    const li = btn.parentElement, label = li.dataset.group
+    const open = li.classList.toggle('open')
+    btn.setAttribute('aria-expanded', open)
+    state.closed = open ? state.closed.filter(l => l !== label) : [...new Set([...state.closed, label])]
+    store.set('sidebar-closed-groups', state.closed)
+  }
+  if (e.target.closest('.item')) document.body.classList.remove('drawer')
+})
+
+function renderRoles() {
+  $('#roles').innerHTML = ROLES.map(r => `<button class="dd-item${r.value === state.role ? ' selected' : ''}" role="menuitemradio"
+    aria-checked="${r.value === state.role}" data-role="${r.value}"><i class="${r.icon}"></i>${r.label}${r.value === state.role ? '<i class="ri-check-line"></i>' : ''}</button>`).join('')
+}
+$('#roles').addEventListener('click', e => {
+  const b = e.target.closest('[data-role]')
+  if (!b) return
+  state.role = b.dataset.role
+  store.set('app-view-role', state.role)
+  renderRoles(); renderMenu()
+})
+
+const dd = $('#dropdown'), avatar = $('#avatar')
+avatar.addEventListener('click', () => { const o = dd.classList.toggle('open'); avatar.setAttribute('aria-expanded', o) })
+document.addEventListener('click', e => { if (!e.target.closest('.profile')) { dd.classList.remove('open'); avatar.setAttribute('aria-expanded', false) } })
+document.addEventListener('keydown', e => { if (e.key === 'Escape') { dd.classList.remove('open'); document.body.classList.remove('drawer') } })
+
+function applyTheme() {
+  document.documentElement.dataset.theme = state.theme
+  $('#mode i').className = state.theme === 'dark' ? 'ri-moon-clear-line' : 'ri-sun-line'
+}
+$('#mode').addEventListener('click', () => { state.theme = state.theme === 'dark' ? 'light' : 'dark'; store.set('theme', state.theme); applyTheme() })
+
+function applyRail() {
+  document.body.classList.toggle('rail', state.rail)
+  $('#pin i').className = state.rail ? 'ri-checkbox-blank-circle-line' : 'ri-radio-button-line'
+}
+$('#pin').addEventListener('click', () => { state.rail = !state.rail; store.set('sidebar-rail', state.rail); applyRail() })
+$('#burger').addEventListener('click', () => document.body.classList.add('drawer'))
+$('#backdrop').addEventListener('click', () => document.body.classList.remove('drawer'))
+
+window.addEventListener('hashchange', renderMenu)
+applyTheme(); applyRail(); renderRoles(); renderMenu()
+</script>
+</body>
+</html>

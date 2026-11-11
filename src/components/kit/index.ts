@@ -1,0 +1,12 @@
+// Shared UI kit — see docs/ui-kit.md. Import from '@/components/kit'.
+export { default as DataTable } from './DataTable'
+export type { Column } from './DataTable'
+export { default as FilterBar } from './FilterBar'
+export type { FilterField, FilterValues } from './FilterBar'
+export { default as FormDialog } from './FormDialog'
+export type { FormField, FormValues } from './FormDialog'
+export { default as ConfirmDialog } from './ConfirmDialog'
+export { default as PrintReport } from './PrintReport'
+export type { ReportColumn } from './PrintReport'
+export { EmptyState, ErrorState, TableSkeleton } from './StateViews'
+export { notifySuccess, notifyError } from './toast'

@@ -1,0 +1,2 @@
+# The backend is a separate package with its own deps + tsconfig — lint it there, not here.
+backend

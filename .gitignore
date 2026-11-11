@@ -1,0 +1,63 @@
+# See https://help.github.com/articles/ignoring-files/ for more about ignoring files.
+
+# dependencies
+/node_modules
+backend/node_modules
+/.pnp
+.pnp.js
+
+# local SQLite dev database (regenerate with: pnpm -C backend exec prisma db push)
+backend/prisma/*.db
+
+# application logs (one file per day, see src/libs/logger)
+/logs
+logs/
+
+# testing
+/coverage
+
+# next.js
+/.next/
+/out/
+
+# production
+/build
+
+# misc
+.DS_Store
+*.pem
+
+# debug
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+.pnpm-debug.log*
+
+# local env files (secrets) — only .env.example is committed
+.env*
+!.env.example
+
+# vercel
+.vercel
+
+# typescript
+*.tsbuildinfo
+next-env.d.ts
+
+# icon generated file
+src/assets/iconify-icons/generated-icons.js
+src/assets/iconify-icons/generated-icons.css
+
+# build/template archives (package.sh output)
+*.tar.gz
+
+# playwright
+/test-results/
+/playwright-report/
+
+# MCP OAuth store (real tokens/grants) — only the example file is committed
+/data/*
+!/data/mcp-store.example.json
+!/data/requests.example.json
+
+.claude/worktrees/

@@ -1,0 +1,45 @@
+{
+  "_comment": "Shape of data/mcp-store.json (the real file is gitignored). All values below are FAKE. Tokens and codes are stored only as SHA-256 hashes, never in plain text.",
+  "clients": [
+    {
+      "client_id": "example-client-id-0000",
+      "client_name": "Claude",
+      "redirect_uris": ["https://claude.ai/api/mcp/auth_callback"],
+      "created_at": "2026-01-01T00:00:00.000Z"
+    }
+  ],
+  "grants": [
+    {
+      "id": "00000000-0000-4000-8000-000000000000",
+      "clientId": "example-client-id-0000",
+      "user": { "userId": "0000000", "name": "ผู้ใช้ ตัวอย่าง", "email": "example@msu.ac.th", "role": "user" },
+      "scopes": ["mcp:read", "mcp:write"],
+      "createdAt": "2026-01-01T00:00:00.000Z",
+      "lastUsedAt": "2026-01-01T01:00:00.000Z",
+      "refreshHash": "0000000000000000000000000000000000000000000000000000000000000000",
+      "refreshExpiresAt": "2026-01-31T00:00:00.000Z",
+      "usedRefreshHashes": []
+    }
+  ],
+  "codes": [],
+  "accessTokens": [
+    {
+      "hash": "1111111111111111111111111111111111111111111111111111111111111111",
+      "grantId": "00000000-0000-4000-8000-000000000000",
+      "expiresAt": "2026-01-01T02:00:00.000Z"
+    }
+  ],
+  "actions": [
+    {
+      "id": "22222222-2222-4222-8222-222222222222",
+      "userId": "0000000",
+      "clientId": "example-client-id-0000",
+      "tool": "save_note",
+      "args": { "text": "ตัวอย่างโน้ต" },
+      "preview": "บันทึกโน้ต: \"ตัวอย่างโน้ต\"",
+      "status": "pending",
+      "createdAt": "2026-01-01T01:00:00.000Z",
+      "expiresAt": "2026-01-01T01:10:00.000Z"
+    }
+  ]
+}

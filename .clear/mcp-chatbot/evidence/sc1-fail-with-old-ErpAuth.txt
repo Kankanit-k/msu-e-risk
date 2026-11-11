@@ -1,0 +1,1 @@
+FAIL  SC1 session has no secrets  ← {"user":{"id":111,"STAFFID":111,"name":"Alice Test","STAFFNAME":"Alice","email":"a@x","SCOPES":{"progc

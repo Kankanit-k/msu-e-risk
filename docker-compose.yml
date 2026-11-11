@@ -1,0 +1,41 @@
+services:
+  frontend:
+    container_name: mui-frontend
+    build:
+      context: .
+      dockerfile: Dockerfile
+    ports:
+      - "3000:3000"
+    environment:
+      - NODE_ENV=production
+      - NEXT_PUBLIC_API_URL=http://localhost:3001
+      # Logging — see .env.example for the full list
+      - LOG_DIR=/app/logs
+      - DISCORD_WEBHOOK_URL=${DISCORD_WEBHOOK_URL:-}
+      - DISCORD_WEBHOOK_ENVIRONMENT=production
+    volumes:
+      # Keep the daily log files on the host so they survive container restarts.
+      - ./logs:/app/logs
+    depends_on:
+      - backend
+    restart: unless-stopped
+    networks:
+      - mui-network
+
+  backend:
+    container_name: mui-backend
+    build:
+      context: ./backend
+      dockerfile: Dockerfile
+    ports:
+      - "3001:3001"
+    environment:
+      - NODE_ENV=production
+      - DATABASE_URL=file:./dev.db
+    restart: unless-stopped
+    networks:
+      - mui-network
+
+networks:
+  mui-network:
+    driver: bridge
