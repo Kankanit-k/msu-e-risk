@@ -11,7 +11,7 @@ library. The reference page that uses all of them is `/requests` (`src/views/req
 | `ConfirmDialog` | Delete, reject, anything irreversible | `color='error'` by default; `confirmDisabled` blocks confirming until, e.g., a reason is typed. |
 | `EmptyState`, `ErrorState`, `TableSkeleton` | Loading / nothing / failure | Always give the next action (a create button, a retry). |
 | `notifySuccess`, `notifyError` | Feedback after every action | react-toastify; the container is mounted in `ClientProviders.tsx`. Pass the error so the reason is shown. |
-| `PrintReport` | Printable Thai report / PDF | Hidden on screen. When printing, only the report is shown (A4, Sarabun, table header repeats on each page). Use a button that calls `window.print()`; "Save as PDF" in the print dialog gives the PDF. |
+| `PrintReport` | Printable Thai report / PDF | Hidden on screen. When printing, only the report is shown (A4, Mornamchi, table header repeats on each page). Use a button that calls `window.print()`; "Save as PDF" in the print dialog gives the PDF. |
 
 ## Export
 

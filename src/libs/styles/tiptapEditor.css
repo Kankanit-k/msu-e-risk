@@ -44,9 +44,8 @@
     padding-block: 0.75rem;
     padding-inline: 1rem;
     border-radius: 0.5rem;
-
   }
-  
+
   pre > code {
     color: inherit;
     padding: 0;

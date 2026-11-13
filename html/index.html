@@ -5,17 +5,20 @@
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <!-- Title is set from CONFIG below: "<page> | MSU-<ABBR>" -->
 <title>MSU-E-RISK</title>
-<link rel="preconnect" href="https://fonts.googleapis.com">
-<link href="https://fonts.googleapis.com/css2?family=Sarabun:wght@400;500;600;700&family=Manrope:wght@600;800&family=IBM+Plex+Sans+Thai:wght@600;700&display=swap" rel="stylesheet">
 <link href="https://cdn.jsdelivr.net/npm/remixicon@4.3.0/fonts/remixicon.css" rel="stylesheet">
 <style>
+@font-face{font-family:'Mornamchi';src:url(fonts/Mornamchi-Light.woff2) format('woff2');font-weight:300;font-display:swap}
+@font-face{font-family:'Mornamchi';src:url(fonts/Mornamchi-Regular.woff2) format('woff2');font-weight:400;font-display:swap}
+@font-face{font-family:'Mornamchi';src:url(fonts/Mornamchi-Bold.woff2) format('woff2');font-weight:700;font-display:swap}
 :root{
   --primary:#6D4CFF;--primary-soft:rgba(109,76,255,.12);
   --bg:#F4F5FA;--paper:#fff;--text:#2E263D;--text2:#6D6777;--divider:#E6E5E8;
   --hover:rgba(46,38,61,.06);--selected:rgba(46,38,61,.10);
   --shadow:0 3px 6px rgba(46,38,61,.12);
   --nav:260px;--rail:68px;--topbar:64px;
-  --font:'Sarabun',sans-serif;--font-head:'Manrope','IBM Plex Sans Thai',sans-serif;
+  --font:'Mornamchi',sans-serif;--font-head:'Mornamchi',sans-serif;
+  /* Risk levels (score = L × I) */
+  --lv-low:#22B07D;--lv-mid:#F2B33D;--lv-high:#F27A1F;--lv-vhigh:#E5266E;
 }
 [data-theme="dark"]{
   --bg:#28243D;--paper:#312D4B;--text:#E7E3FC;--text2:#B6B1CC;--divider:#474360;
@@ -25,20 +28,20 @@
 body{margin:0;font-family:var(--font);background:var(--bg);color:var(--text);font-size:15px}
 button{font:inherit;color:inherit;background:none;border:0;cursor:pointer;text-align:start}
 a{color:inherit;text-decoration:none}
+select,input{font:inherit;color:var(--text);background:var(--paper);border:1px solid var(--divider);border-radius:8px;padding:7px 10px}
 
 /* ── Sidebar ── */
 .nav{position:fixed;inset-block:0;inset-inline-start:0;inline-size:var(--nav);background:var(--paper);
   border-inline-end:1px solid var(--divider);box-shadow:4px 0 16px -10px rgba(15,23,42,.1);
   display:flex;flex-direction:column;z-index:20;transition:inline-size .25s,transform .25s}
-.brand{display:flex;align-items:center;gap:10px;padding:20px 16px 20px 22px}
-.brand-logo{inline-size:52px;block-size:52px;flex-shrink:0;padding:5px;border-radius:12px;background:#fff;
-  box-shadow:0 0 0 1px rgba(15,23,42,.06);display:grid;place-items:center}
-.brand-logo img{block-size:42px}
-.brand-text{display:flex;flex-direction:column;min-inline-size:0;flex:1}
-.brand-over{font-size:.625rem;font-weight:600;letter-spacing:.06em;text-transform:uppercase;color:var(--text2);white-space:nowrap}
-.brand-name{font-family:var(--font-head);font-size:1.375rem;font-weight:800;letter-spacing:-.02em;line-height:1.2;white-space:nowrap}
-.brand-sub{font-size:.75rem;color:var(--text2);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
-.pin{color:var(--text2);font-size:1.25rem}
+.brand{display:flex;align-items:center;gap:8px;padding:15px 12px}
+.brand-logo{display:flex;align-items:center;min-inline-size:0;gap:8px}
+.brand-logo img{block-size:16px;flex-shrink:0}
+.brand-text{display:flex;flex-direction:column;min-inline-size:0;overflow:hidden}
+.brand-over{font-size:.475rem;font-weight:600;letter-spacing:0;text-transform:uppercase;color:var(--text2);white-space:nowrap}
+.brand-name{font-family:var(--font-head);font-size:1.0625rem;font-weight:800;letter-spacing:-.02em;line-height:1.2;white-space:nowrap}
+.brand-sub{font-size:.625rem;color:var(--text2);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.pin{color:var(--text2);font-size:1.25rem;flex-shrink:0;margin-inline-start:auto}
 
 .menu{flex:1;overflow-y:auto;padding:4px 16px 8px 0;margin:0;list-style:none}
 .menu ul{list-style:none;margin:0;padding:0;overflow:hidden}
@@ -51,23 +54,24 @@ a{color:inherit;text-decoration:none}
 .group.open>.group-btn .chev{transform:rotate(90deg)}
 .group:not(.open)>ul{display:none}
 .group ul .item{padding-inline-start:30px}
-.group ul .item>i{font-size:.75rem;color:var(--text2)}
+.group ul .item>i{font-size:1.1rem;color:var(--text2)}
 .item.active{background:var(--primary-soft);color:var(--primary);font-weight:600}
 .item.active>i{color:var(--primary)}
 .label{flex:1;overflow:hidden;text-overflow:ellipsis}
 .chip{font-size:.7rem;padding:1px 8px;border-radius:12px;border:1px solid #56CA00;color:#56CA00}
+.count{font-size:.7rem;min-inline-size:20px;padding:1px 6px;border-radius:10px;background:var(--lv-vhigh);color:#fff;text-align:center;font-weight:700}
 
-.nav-foot{border-block-start:1px solid var(--divider);padding:12px 16px;font-size:.75rem}
-.nav-foot h6{margin:0 0 8px;font-size:.625rem;letter-spacing:.1em;text-transform:uppercase;color:var(--primary)}
-.dev{display:flex;gap:8px;align-items:center;margin-block-end:6px}
-.dev span:first-child{inline-size:26px;block-size:26px;border-radius:6px;background:var(--primary-soft);display:grid;place-items:center}
+.nav-foot{padding:12px}
+.round-card{border-radius:12px;padding:14px;color:#fff;background:linear-gradient(135deg,#6D4CFF,#4B2FD1);font-size:.75rem}
+.round-card b{display:block;font-size:.95rem;margin-block:2px 8px}
+.round-card .bar{block-size:6px;border-radius:3px;background:rgba(255,255,255,.3);overflow:hidden;margin-block-end:6px}
+.round-card .bar span{display:block;block-size:100%;background:#fff;border-radius:3px}
 
 /* Icon-only rail (desktop, pinned off) — expands on hover */
 body.rail .nav:not(:hover){inline-size:var(--rail)}
-body.rail .nav:not(:hover) :is(.brand-text,.pin,.label,.chip,.chev,.nav-foot){display:none}
+body.rail .nav:not(:hover) :is(.brand-text,.pin,.label,.chip,.count,.chev,.nav-foot){display:none}
 body.rail .nav:not(:hover) .group>ul{display:none}
 body.rail .nav:not(:hover) .brand{padding-inline:8px}
-body.rail .nav:not(:hover) .brand-logo{inline-size:48px;block-size:48px}
 body.rail .nav:not(:hover) .menu{padding-inline-end:8px}
 body.rail .nav:not(:hover) :is(.item,.group-btn){padding-inline-start:22px}
 
@@ -76,10 +80,13 @@ body.rail .nav:not(:hover) :is(.item,.group-btn){padding-inline-start:22px}
 body.rail .main{margin-inline-start:var(--rail)}
 .topbar{position:sticky;top:0;z-index:10;block-size:var(--topbar);display:flex;align-items:center;gap:8px;
   padding-inline:24px;background:color-mix(in srgb,var(--bg) 85%,transparent);backdrop-filter:blur(6px)}
-.icon-btn{inline-size:38px;block-size:38px;border-radius:50%;display:grid;place-items:center;font-size:1.3rem}
+.icon-btn{inline-size:38px;block-size:38px;border-radius:50%;display:grid;place-items:center;font-size:1.3rem;position:relative}
 .icon-btn:hover{background:var(--hover)}
+.icon-btn .count{position:absolute;inset-block-start:2px;inset-inline-end:0}
 .burger{display:none}
 .spacer{flex:1}
+.search{display:flex;align-items:center;gap:8px;background:var(--paper);border:1px solid var(--divider);border-radius:10px;padding-inline:12px;inline-size:min(420px,100%)}
+.search input{border:0;padding:8px 0;flex:1;min-inline-size:0;outline:none;background:none}
 .avatar{inline-size:38px;block-size:38px;border-radius:50%;background:var(--primary-soft);color:var(--primary);
   display:grid;place-items:center;font-weight:700;position:relative}
 .avatar::after{content:'';position:absolute;inset-block-end:0;inset-inline-end:0;inline-size:9px;block-size:9px;border-radius:50%;
@@ -99,12 +106,116 @@ body.rail .main{margin-inline-start:var(--rail)}
 .logout{margin:8px 16px 4px;inline-size:calc(100% - 32px);padding:6px;border-radius:6px;background:#FF4C51;color:#fff;font-weight:600}
 
 .content{flex:1;padding:24px;max-inline-size:1440px;inline-size:100%;margin-inline:auto}
-.card{background:var(--paper);border-radius:10px;box-shadow:var(--shadow);padding:24px}
+.card{background:var(--paper);border-radius:12px;box-shadow:var(--shadow);padding:20px}
 .card h1{font-family:var(--font-head);font-size:1.25rem;margin:0 0 4px}
-.card p{color:var(--text2);margin:0}
+.muted{color:var(--text2)}
 footer{padding:16px 24px;text-align:center;color:var(--text2);font-size:.85rem}
-
 .backdrop{display:none;position:fixed;inset:0;background:rgba(0,0,0,.4);z-index:15}
+
+/* ── Dashboard ── */
+.page-head{display:flex;flex-wrap:wrap;gap:12px 24px;align-items:flex-end;justify-content:space-between;margin-block-end:20px}
+.page-head h1{font-family:var(--font-head);font-size:1.5rem;margin:2px 0}
+.page-head p{margin:0;font-size:.85rem}
+.crumb{font-size:.8rem;color:var(--text2)}
+.filters{display:flex;flex-wrap:wrap;gap:8px;align-items:center}
+.btn-primary{background:var(--primary);color:#fff;border-radius:8px;padding:8px 14px;font-weight:600;display:inline-flex;gap:6px;align-items:center}
+.btn-primary:hover{filter:brightness(1.08)}
+
+.kpis{display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:16px;margin-block-end:20px}
+.kpi{border-radius:14px;padding:16px;color:#fff;box-shadow:var(--shadow);display:flex;flex-direction:column;gap:4px;transition:transform .15s}
+.kpi:hover{transform:translateY(-2px)}
+.kpi .k-top{display:flex;justify-content:space-between;align-items:flex-start;gap:8px}
+.kpi small{font-size:.7rem;letter-spacing:.06em;text-transform:uppercase;opacity:.85}
+.kpi .k-title{font-weight:600;font-size:.9rem}
+.kpi .k-ico{inline-size:36px;block-size:36px;border-radius:10px;background:rgba(255,255,255,.22);display:grid;place-items:center;font-size:1.2rem;flex-shrink:0}
+.kpi .k-val{font-family:var(--font-head);font-size:2rem;font-weight:800;line-height:1.1;margin-block-start:6px}
+.kpi .k-val span{font-size:1rem;font-weight:600;opacity:.85}
+.kpi .k-sub{font-size:.8rem;opacity:.92}
+.kpi .bar{block-size:5px;border-radius:3px;background:rgba(255,255,255,.3);overflow:hidden;margin-block:4px}
+.kpi .bar span{display:block;block-size:100%;background:#fff}
+
+.row{display:grid;grid-template-columns:minmax(0,2fr) minmax(0,1fr);gap:16px;margin-block-end:16px}
+.panel-head{display:flex;flex-wrap:wrap;gap:8px;justify-content:space-between;align-items:center;margin-block-end:14px}
+.panel-head h2{font-size:1.05rem;margin:0;font-family:var(--font-head)}
+.panel-head p{margin:2px 0 0;font-size:.8rem;color:var(--text2)}
+.link{color:var(--primary);font-size:.85rem;font-weight:600}
+
+.seg{display:inline-flex;border:1px solid var(--divider);border-radius:8px;overflow:hidden}
+.seg button{padding:5px 12px;font-size:.8rem}
+.seg button.on{background:var(--primary);color:#fff}
+
+.legend{display:flex;flex-wrap:wrap;gap:6px}
+.lv{font-size:.72rem;padding:2px 8px;border-radius:6px;color:#fff;font-weight:600;white-space:nowrap}
+
+/* Heatmap */
+.heat{display:grid;grid-template-columns:28px repeat(5,minmax(0,1fr));gap:6px;align-items:stretch}
+.heat .ax{display:grid;place-items:center;font-size:.8rem;color:var(--text2)}
+.cell{border-radius:10px;color:#fff;text-align:center;padding:10px 4px;min-block-size:58px;display:flex;flex-direction:column;justify-content:center;transition:transform .12s,box-shadow .12s}
+.cell:hover{transform:scale(1.03);box-shadow:0 4px 12px rgba(0,0,0,.18)}
+.cell b{font-size:1.3rem;line-height:1}
+.cell small{font-size:.65rem;opacity:.9}
+.cell.zero{opacity:.35}
+.ax-title{font-size:.75rem;color:var(--text2);text-align:center;margin-block-start:8px}
+
+/* KRI */
+.kri{display:block;inline-size:100%;border-radius:10px;padding:10px 12px;margin-block-end:8px;border-inline-start:4px solid;background:var(--hover)}
+.kri:hover{background:var(--selected)}
+.kri .t{display:flex;justify-content:space-between;gap:8px;font-weight:600;font-size:.88rem}
+.kri small{color:var(--text2);font-size:.75rem}
+.tag{font-size:.65rem;font-weight:700;padding:2px 8px;border-radius:10px;color:#fff;align-self:flex-start;white-space:nowrap}
+
+/* Status matrix */
+.matrix{inline-size:100%;border-collapse:collapse;font-size:.83rem}
+.matrix th{font-weight:600;color:var(--text2);text-align:start;padding:6px 8px;font-size:.78rem}
+.matrix td{padding:5px 8px;border-block-start:1px solid var(--divider)}
+.matrix td:first-child{white-space:nowrap;max-inline-size:220px;overflow:hidden;text-overflow:ellipsis}
+.st{display:inline-block;font-size:.72rem;padding:2px 8px;border-radius:10px;font-weight:600;white-space:nowrap}
+.st-legend{display:flex;flex-wrap:wrap;gap:6px;margin-block-end:10px}
+.st-legend button{display:inline-flex;gap:4px;align-items:center}
+.scroll{overflow-x:auto}
+
+/* Donut */
+.donut-wrap{display:flex;flex-direction:column;align-items:center;gap:12px}
+.donut path,.donut circle.seg{cursor:pointer;transition:opacity .15s}
+.donut circle.seg:hover{opacity:.8}
+.dlegend{display:grid;grid-template-columns:1fr 1fr;gap:4px 12px;inline-size:100%;font-size:.8rem}
+.dlegend button{display:flex;gap:6px;align-items:center;padding:3px 4px;border-radius:6px}
+.dlegend button:hover{background:var(--hover)}
+.dot{inline-size:10px;block-size:10px;border-radius:50%;flex-shrink:0}
+
+/* Tables */
+.tbl{inline-size:100%;border-collapse:collapse;font-size:.85rem}
+.tbl th{text-align:start;font-size:.75rem;color:var(--text2);font-weight:600;padding:8px;border-block-end:1px solid var(--divider);white-space:nowrap}
+.tbl td{padding:9px 8px;border-block-end:1px solid var(--divider)}
+.tbl tbody tr{cursor:pointer}
+.tbl tbody tr:hover{background:var(--hover)}
+.mono{font-family:ui-monospace,Menlo,monospace;font-size:.78rem;color:var(--text2);white-space:nowrap}
+.score{display:inline-grid;place-items:center;min-inline-size:28px;padding:2px 6px;border-radius:8px;color:#fff;font-weight:700;font-size:.78rem}
+.trend-up{color:var(--lv-vhigh)}.trend-down{color:var(--lv-low)}.trend-eq{color:var(--text2)}
+
+/* Tasks */
+.task{display:block;inline-size:100%;border-radius:10px;padding:10px 12px;margin-block-end:8px;border:1px solid var(--divider)}
+.task:hover{background:var(--hover)}
+.task .t{display:flex;justify-content:space-between;gap:8px;font-weight:600;font-size:.88rem}
+.task small{color:var(--text2);font-size:.75rem}
+
+/* Modal + toast */
+dialog{border:0;border-radius:14px;padding:0;inline-size:min(860px,calc(100vw - 32px));max-block-size:calc(100vh - 48px);background:var(--paper);color:var(--text);box-shadow:0 12px 40px rgba(0,0,0,.3)}
+dialog::backdrop{background:rgba(20,16,40,.45)}
+.m-head{display:flex;justify-content:space-between;align-items:center;gap:12px;padding:16px 20px;border-block-end:1px solid var(--divider);position:sticky;top:0;background:var(--paper)}
+.m-head h3{margin:0;font-size:1.05rem;font-family:var(--font-head)}
+.m-body{padding:16px 20px}
+.pager{display:flex;justify-content:space-between;align-items:center;gap:8px;margin-block-start:12px;font-size:.85rem;color:var(--text2)}
+.pager button{border:1px solid var(--divider);border-radius:8px;padding:4px 12px}
+.pager button:disabled{opacity:.4;cursor:default}
+.empty{text-align:center;padding:32px 12px;color:var(--text2)}
+.empty i{font-size:2.5rem;display:block;margin-block-end:6px;opacity:.6}
+.kv{display:grid;grid-template-columns:140px 1fr;gap:8px 12px;font-size:.9rem;margin-block-end:16px}
+.kv dt{color:var(--text2)}.kv dd{margin:0}
+.rounds{display:grid;grid-template-columns:repeat(5,1fr);gap:8px;text-align:center;font-size:.75rem}
+.rounds div{border:1px solid var(--divider);border-radius:10px;padding:8px 4px}
+.toast{position:fixed;inset-block-end:24px;inset-inline-start:50%;transform:translateX(-50%);background:#2E263D;color:#fff;padding:10px 18px;border-radius:10px;box-shadow:var(--shadow);z-index:50;display:none;gap:8px;align-items:center}
+.toast.show{display:flex}
 
 /* ── Mobile: sidebar becomes a drawer ── */
 @media (max-width:1199px){
@@ -114,8 +225,20 @@ footer{padding:16px 24px;text-align:center;color:var(--text2);font-size:.85rem}
   .main,body.rail .main{margin-inline-start:0}
   .pin{display:none}
   .burger{display:grid}
-  body.rail .nav :is(.brand-text,.label,.chip,.chev,.nav-foot){display:revert}
+  body.rail .nav :is(.brand-text,.label,.chip,.count,.chev,.nav-foot){display:revert}
   .topbar,.content{padding-inline:16px}
+  .row{grid-template-columns:minmax(0,1fr)}
+}
+@media (max-width:640px){
+  .search kbd,.search{display:none}
+  .cell{min-block-size:46px;padding:6px 2px}.cell b{font-size:1.05rem}.cell small{display:none}
+  /* Tables collapse to stacked cards */
+  .tbl thead{display:none}
+  .tbl tr{display:block;border:1px solid var(--divider);border-radius:10px;padding:8px;margin-block-end:8px}
+  .tbl td{display:flex;justify-content:space-between;gap:12px;border:0;padding:3px 4px}
+  .tbl td::before{content:attr(data-h);color:var(--text2);font-size:.75rem}
+  .kv{grid-template-columns:1fr}
+  .rounds{grid-template-columns:repeat(2,1fr)}
 }
 </style>
 </head>
@@ -123,28 +246,28 @@ footer{padding:16px 24px;text-align:center;color:var(--text2);font-size:.85rem}
 
 <aside class="nav" id="nav">
   <div class="brand">
-    <a href="#" class="brand-logo"><img src="msu-crest.png" alt="MSU"></a>
-    <div class="brand-text">
-      <span class="brand-over" data-cfg="overline"></span>
-      <span class="brand-name" data-cfg="name"></span>
-      <span class="brand-sub" data-cfg="subtitle"></span>
-    </div>
+    <a href="#" class="brand-logo">
+      <img src="msu-logo.png" alt="MSU">
+      <div class="brand-text">
+        <span class="brand-over" data-cfg="overline"></span>
+        <span class="brand-name" data-cfg="name"></span>
+        <span class="brand-sub" data-cfg="subtitle"></span>
+      </div>
+    </a>
     <button class="pin" id="pin" title="ย่อ/ขยายแถบเมนู" aria-label="ย่อ/ขยายแถบเมนู"><i class="ri-radio-button-line"></i></button>
   </div>
   <ul class="menu" id="menu"></ul>
-  <div class="nav-foot">
-    <h6>ผู้พัฒนาระบบ</h6>
-    <div class="dev"><span>👩</span><div><b>นางสาว######</b><br><small>กระบวนการ</small></div></div>
-    <div class="dev"><span>👨</span><div><b>นาย#######</b><br><small>ระบบ</small></div></div>
-  </div>
+  <div class="nav-foot" id="nav-foot"></div>
 </aside>
 <div class="backdrop" id="backdrop"></div>
 
 <div class="main">
   <header class="topbar">
     <button class="icon-btn burger" id="burger" aria-label="เปิดเมนู"><i class="ri-menu-line"></i></button>
-    <button class="icon-btn" id="mode" aria-label="สลับโหมดสว่าง/มืด"><i class="ri-sun-line"></i></button>
+    <label class="search"><i class="ri-search-line muted"></i><input id="search" placeholder="ค้นหาความเสี่ยง / รหัส / หน่วยงาน… (Enter)"></label>
     <div class="spacer"></div>
+    <button class="icon-btn" id="bell" aria-label="งานที่ต้องดำเนินการ"><i class="ri-notification-3-line"></i><span class="count" id="bell-count"></span></button>
+    <button class="icon-btn" id="mode" aria-label="สลับโหมดสว่าง/มืด"><i class="ri-sun-line"></i></button>
     <div class="profile">
       <button class="avatar" id="avatar" aria-haspopup="menu" aria-expanded="false">ผ</button>
       <div class="dropdown" id="dropdown" role="menu">
@@ -160,44 +283,48 @@ footer{padding:16px 24px;text-align:center;color:var(--text2);font-size:.85rem}
     </div>
   </header>
 
-  <main class="content">
-    <div class="card">
-      <h1 id="page-title"></h1>
-      <p>เนื้อหาของหน้า… (HTML version — ไฟล์เดียว ไม่ต้อง build)</p>
-    </div>
-  </main>
-  <footer>© <span id="year"></span> มหาวิทยาลัยมหาสารคาม</footer>
+  <main class="content" id="content"></main>
+  <footer>© <span id="year"></span> มหาวิทยาลัยมหาสารคาม · ข้อมูลในหน้านี้เป็นข้อมูลสมมติสำหรับ mockup</footer>
 </div>
 
+<dialog id="modal" aria-labelledby="modal-title">
+  <div class="m-head"><h3 id="modal-title"></h3><button class="icon-btn" id="modal-close" aria-label="ปิด"><i class="ri-close-line"></i></button></div>
+  <div class="m-body" id="modal-body"></div>
+</dialog>
+<div class="toast" id="toast" role="status"></div>
+
 <script>
-/* ════ CONFIG — rename the system here first (same rule as themeConfig.ts) ════
-   name     : MSU-<ABBR>  (uppercase English abbreviation, e.g. MSU-CAR)
-   subtitle : full Thai system name (e.g. ระบบขอใช้รถ มมส)
-   Tab title becomes "<page> | MSU-<ABBR>". */
+/* ════ CONFIG — rename the system here first (same rule as themeConfig.ts) ════ */
 const CONFIG = {
   overline: 'Mahasarakham University',
-  name: 'MSU-E-RISK',            // ⚠️ rename
-  subtitle: 'ระบบบริหารความเสี่ยง มมส' // ⚠️ rename
+  name: 'MSU-E-RISK',
+  subtitle: 'ระบบบริหารความเสี่ยง มมส'
 }
 
 // Sidebar menu — single source of truth. minRole hides a group below that tier (visibility only).
+// Groups follow the e-Risk workflow (Design/Workflow-e-Risk.png).
 const MENU = [
-  { label: 'แดชบอร์ด', icon: 'ri-dashboard-line', children: [
-    { label: 'หน้าหลัก', href: '#home', icon: 'ri-home-smile-line' },
-    { label: 'CRM', href: '#crm', icon: 'ri-line-chart-line' },
-    { label: 'Analytics', href: '#analytics', icon: 'ri-bar-chart-box-line', public: true }
+  { label: 'HOME', icon: 'ri-home-line', children: [
+    { label: 'Dashboard', href: '#dashboard', icon: 'ri-dashboard-line', badge: 'tasks' }
   ]},
-  { label: 'ตาราง', icon: 'ri-table-2', children: [
-    { label: 'ผู้ใช้งาน', href: '#users', icon: 'ri-table-line', public: true }
+  { label: 'ความเสี่ยง', icon: 'ri-shield-flash-line', children: [
+    { label: 'SO', href: '#so', icon: 'ri-star-line' },
+    { label: 'เป้าประสงค์', href: '#goals', icon: 'ri-focus-3-line' },
+    { label: 'ERM1', href: '#erm1', icon: 'ri-chat-search-line' },
+    { label: 'ERM2 - 3', href: '#erm2-3', icon: 'ri-record-circle-line' },
+    { label: 'ERM4', href: '#erm4', icon: 'ri-menu-2-line' }
   ]},
-  { label: 'ผู้ดูแลหน่วยงาน', icon: 'ri-shield-user-line', minRole: 'deptAdmin', children: [
-    { label: 'จัดการผู้ใช้', href: '#admin-users', icon: 'ri-shield-user-line' }
+  { label: 'ควบคุมภายใน', icon: 'ri-shield-check-line', children: [
+    { label: 'ตั้งค่าข้อคำถาม', href: '#questions', icon: 'ri-equalizer-line' },
+    { label: 'ภาคผนวก ก.', href: '#appendix-a', icon: 'ri-file-text-line' },
+    { label: 'ปค. 4', href: '#pk4', icon: 'ri-file-list-2-line' },
+    { label: 'ภาคผนวก ข.', href: '#appendix-b', icon: 'ri-file-text-line' },
+    { label: 'ปค. 5', href: '#pk5', icon: 'ri-stack-line' },
+    { label: 'แบบติดตาม ปค. 5', href: '#pk5-followup', icon: 'ri-clipboard-line' },
+    { label: 'เอกสารเพื่อประเมินเบื้องต้น', href: '#documents', icon: 'ri-file-search-line' }
   ]},
-  { label: 'ผู้ดูแลมหาวิทยาลัย', icon: 'ri-government-line', minRole: 'universityAdmin', children: [
-    { label: 'จัดการหน่วยงาน', href: '#admin-units', icon: 'ri-government-line' }
-  ]},
-  { label: 'อื่น ๆ', icon: 'ri-more-line', children: [
-    { label: 'เกี่ยวกับเรา', href: '#about', icon: 'ri-information-line' }
+  { label: 'ตั้งค่าระบบ', icon: 'ri-settings-3-line', minRole: 'universityAdmin', children: [
+    { label: 'เปิด-ปิด ระบบ', href: '#system', icon: 'ri-toggle-line' }
   ]}
 ]
 
@@ -208,6 +335,107 @@ const ROLES = [
 ]
 const RANK = { user: 0, deptAdmin: 1, universityAdmin: 2 }
 
+/* ════ MOCK DATA (fictional, deterministic per fiscal year) ════ */
+const UNITS = ['คณะวิทยาศาสตร์', 'คณะวิศวกรรมศาสตร์', 'คณะแพทยศาสตร์', 'คณะพยาบาลศาสตร์', 'คณะศึกษาศาสตร์',
+  'คณะการบัญชีและการจัดการ', 'คณะมนุษยศาสตร์และสังคมศาสตร์', 'คณะเทคโนโลยี', 'สำนักคอมพิวเตอร์',
+  'สำนักวิทยบริการ', 'กองคลัง', 'กองบริหารงานบุคคล', 'กองกิจการนิสิต', 'กองอาคารสถานที่']
+const CATS = [
+  { name: 'กลยุทธ์', color: '#6D4CFF' }, { name: 'การดำเนินงาน', color: '#16A3A3' },
+  { name: 'การเงิน', color: '#F2B33D' }, { name: 'กฎระเบียบ', color: '#1E6FD9' },
+  { name: 'เทคโนโลยีสารสนเทศ', color: '#E5266E' }, { name: 'ชื่อเสียงองค์กร', color: '#8A5A33' }
+]
+const RISK_TEMPLATES = [
+  [0, 'จำนวนนิสิตใหม่ต่ำกว่าแผนรับ'], [0, 'หลักสูตรไม่ตอบโจทย์ตลาดแรงงาน'], [0, 'ผลงานวิจัยตีพิมพ์ไม่ถึงเป้าหมาย'],
+  [1, 'บุคลากรสายวิชาการลาออก/เกษียณโดยไม่มีผู้ทดแทน'], [1, 'อุบัติเหตุในห้องปฏิบัติการ'], [1, 'ครุภัณฑ์การเรียนการสอนชำรุดหรือล้าสมัย'],
+  [1, 'การจัดซื้อจัดจ้างล่าช้ากว่าแผน'], [2, 'รายได้ค่าธรรมเนียมการศึกษาลดลง'], [2, 'การเบิกจ่ายงบประมาณไม่เป็นไปตามแผน'],
+  [2, 'ค่าสาธารณูปโภคสูงกว่างบประมาณ'], [3, 'การปฏิบัติไม่สอดคล้องกับ พ.ร.บ.คุ้มครองข้อมูลส่วนบุคคล'],
+  [3, 'หลักสูตรไม่ผ่านเกณฑ์มาตรฐาน อว.'], [3, 'การจัดซื้อไม่เป็นไปตาม พ.ร.บ.จัดซื้อจัดจ้างฯ'],
+  [4, 'ระบบสารสนเทศหลักหยุดชะงัก'], [4, 'ถูกโจมตีทางไซเบอร์/ข้อมูลรั่วไหล'], [4, 'ระบบ e-Learning รองรับผู้ใช้ไม่เพียงพอ'],
+  [5, 'ข่าวเชิงลบในสื่อสังคมออนไลน์'], [5, 'ข้อร้องเรียนด้านคุณภาพการให้บริการนิสิต']
+]
+const OWNERS = ['รองคณบดีฝ่ายบริหาร', 'รองคณบดีฝ่ายวิชาการ', 'หัวหน้าสำนักงาน', 'ผู้อำนวยการกอง', 'หัวหน้างานพัสดุ', 'หัวหน้างานการเงิน', 'หัวหน้างานเทคโนโลยีสารสนเทศ']
+const KRI_TEMPLATES = [
+  { name: 'อัตรานิสิตใหม่เทียบแผนรับ', unit: '%', thr: 90, dir: 'min' },
+  { name: 'ร้อยละการเบิกจ่ายงบประมาณ', unit: '%', thr: 70, dir: 'min' },
+  { name: 'จำนวนครั้งที่ระบบหลักล่ม', unit: 'ครั้ง', thr: 2, dir: 'max' },
+  { name: 'บุคลากรผ่านการอบรม PDPA', unit: '%', thr: 80, dir: 'min' },
+  { name: 'จำนวนข้อร้องเรียนจากนิสิต', unit: 'เรื่อง', thr: 5, dir: 'max' },
+  { name: 'อัตราการคงอยู่ของนิสิตชั้นปีที่ 1', unit: '%', thr: 85, dir: 'min' },
+  { name: 'อุบัติเหตุในห้องปฏิบัติการ', unit: 'ครั้ง', thr: 1, dir: 'max' },
+  { name: 'โครงการจัดซื้อที่ล่าช้า', unit: '%', thr: 10, dir: 'max' }
+]
+// Fiscal year runs 1 Oct – 30 Sep. Rounds follow the workflow.
+const ROUNDS = [
+  { label: 'วางแผน', short: 'วางแผน', due: y => `30 พ.ย. ${y - 1}` },
+  { label: '6 เดือน', short: '6 ด.', due: y => `20 มี.ค. ${y}` },
+  { label: '9 เดือน', short: '9 ด.', due: y => `19 มิ.ย. ${y}` },
+  { label: '12 เดือน', short: '12 ด.', due: y => `28 ก.ย. ${y}` }
+]
+const STATUS = {
+  closed: { label: 'ยังไม่เปิด', bg: 'transparent', fg: 'var(--text2)', border: '1px dashed var(--divider)' },
+  none: { label: 'ยังไม่เริ่ม', bg: 'var(--selected)', fg: 'var(--text2)' },
+  draft: { label: 'ร่าง', bg: '#DCEBFF', fg: '#1553A8' },
+  head: { label: 'รอหัวหน้าเห็นชอบ', bg: '#FFF1D6', fg: '#A66A00' },
+  back: { label: 'ตีกลับแก้ไข', bg: '#FFE0E8', fg: '#B81A55' },
+  plan: { label: 'รอกองแผนรับรอง', bg: '#ECE6FF', fg: '#4B2FD1' },
+  ok: { label: 'รับรองแล้ว', bg: '#DDF5EA', fg: '#137A55' }
+}
+
+function prng(seed) { // mulberry32
+  return () => { seed |= 0; seed = seed + 0x6D2B79F5 | 0; let t = Math.imul(seed ^ seed >>> 15, 1 | seed); t = t + Math.imul(t ^ t >>> 7, 61 | t) ^ t; return ((t ^ t >>> 14) >>> 0) / 4294967296 }
+}
+const cache = {}
+function yearData(year) {
+  if (cache[year]) return cache[year]
+  const r = prng(year)
+  const risks = [], kris = []
+  let seq = 1
+  UNITS.forEach((unit, ui) => {
+    const pool = [...RISK_TEMPLATES].sort(() => r() - .5).slice(0, 5 + Math.floor(r() * 5))
+    pool.forEach(([cat, name]) => {
+      const L = 2 + Math.floor(r() * 4), I = 2 + Math.floor(r() * 4)
+      risks.push({
+        id: `RSK-${String(year).slice(2)}-${String(seq++).padStart(3, '0')}`, name, cat, unit, ui,
+        owner: OWNERS[Math.floor(r() * OWNERS.length)], L, I,
+        dL: Math.floor(r() * 3), dI: Math.floor(r() * 2), worsen: r() < .1, speed: .55 + r() * .7,
+        measure: ['ทบทวนและปรับปรุงคู่มือปฏิบัติงาน', 'จัดอบรมบุคลากรที่เกี่ยวข้อง', 'ติดตั้งระบบเฝ้าระวังและแจ้งเตือน', 'จัดทำแผนสำรองและซ้อมแผน', 'ปรับกระบวนการและกำหนดผู้รับผิดชอบชัดเจน'][Math.floor(r() * 5)]
+      })
+    })
+    ;[...KRI_TEMPLATES].sort(() => r() - .5).slice(0, 1 + Math.floor(r() * 2))
+      .forEach(t => kris.push({ ...t, unit_: unit, ui, base: r(), drift: r() * .3 - .15 }))
+  })
+  return (cache[year] = { risks, kris })
+}
+const residual = (k, round) => k.worsen
+  ? { L: Math.min(5, k.L + (round >= 2 ? 1 : 0)), I: k.I }
+  : { L: Math.max(1, k.L - Math.round(k.dL * (round + 1) / 4)), I: Math.max(1, k.I - Math.round(k.dI * (round + 1) / 4)) }
+const scoreAt = (k, round) => { const x = residual(k, round); return x.L * x.I }
+const progress = (k, round) => Math.min(100, Math.round((round + 1) / 4 * 100 * k.speed))
+const delayed = (k, round) => progress(k, round) < (round + 1) / 4 * 100 - 10
+const trend = (k, round) => { const now = scoreAt(k, round), prev = round ? scoreAt(k, round - 1) : k.L * k.I; return Math.sign(now - prev) }
+function level(s) {
+  if (s <= 4) return { name: 'ต่ำ', c: 'var(--lv-low)' }
+  if (s <= 9) return { name: 'ปานกลาง', c: 'var(--lv-mid)' }
+  if (s <= 15) return { name: 'สูง', c: 'var(--lv-high)' }
+  return { name: 'สูงมาก', c: 'var(--lv-vhigh)' }
+}
+function kriValue(k, year, round) {
+  const v = k.dir === 'min' ? k.thr * (.82 + k.base * .3 + k.drift * round / 3) : k.thr * (.4 + k.base * 1.0 + k.drift * round)
+  return k.unit === '%' ? Math.round(v * 10) / 10 : Math.max(0, Math.round(v))
+}
+function kriStatus(k, v) {
+  if (k.dir === 'min') return v < k.thr ? 'RED' : v < k.thr * 1.06 ? 'AMBER' : 'GREEN'
+  return v > k.thr ? 'RED' : v >= k.thr * .8 && v > 0 ? 'AMBER' : 'GREEN'
+}
+const KRI_C = { RED: 'var(--lv-vhigh)', AMBER: 'var(--lv-mid)', GREEN: 'var(--lv-low)' }
+function unitStatus(year, round, ui, sel) {
+  if (round > sel) return 'closed'
+  if (round < sel) return 'ok'
+  const x = prng(year * 1000 + round * 97 + ui * 13)()
+  return x < .3 ? 'ok' : x < .5 ? 'plan' : x < .65 ? 'head' : x < .75 ? 'back' : x < .9 ? 'draft' : 'none'
+}
+
+/* ════ STATE ════ */
 // Per-viewer preferences; storage may be blocked (private mode) → fall back to defaults
 const store = {
   get: (k, d) => { try { return JSON.parse(localStorage.getItem(k)) ?? d } catch { return d } },
@@ -217,35 +445,75 @@ const state = {
   role: store.get('app-view-role', 'user'),
   closed: store.get('sidebar-closed-groups', []),
   rail: store.get('sidebar-rail', false),
-  theme: store.get('theme', 'light')
+  theme: store.get('theme', 'light'),
+  f: store.get('dash-filter', { year: 2569, round: 2, unit: 'all', heat: 'res' })
 }
 
 const $ = s => document.querySelector(s)
 const esc = s => String(s).replace(/[&<>"]/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' })[c])
+const pill = s => `<span class="st" style="background:${STATUS[s].bg};color:${STATUS[s].fg};${STATUS[s].border ? 'border:' + STATUS[s].border : ''}">${STATUS[s].label}</span>`
+const scoreChip = s => `<span class="score" style="background:${level(s).c}" title="${level(s).name}">${s}</span>`
+const trendIcon = t => t > 0 ? '<i class="ri-arrow-up-line trend-up" title="เพิ่มขึ้น"></i>' : t < 0 ? '<i class="ri-arrow-down-line trend-down" title="ลดลง"></i>' : '<i class="ri-subtract-line trend-eq" title="คงที่"></i>'
 
 document.querySelectorAll('[data-cfg]').forEach(el => { el.textContent = CONFIG[el.dataset.cfg] })
 $('#year').textContent = new Date().getFullYear() + 543
 
+// Everything the dashboard shows, derived from the current filters
+function view() {
+  const { year, round, unit } = state.f
+  const d = yearData(year)
+  const inUnit = x => unit === 'all' || x.ui === +unit
+  const risks = d.risks.filter(inUnit)
+  const kris = d.kris.filter(inUnit).map(k => { const v = kriValue(k, year, round); return { ...k, v, st: kriStatus(k, v) } })
+  const units = UNITS.map((name, ui) => ({ name, ui })).filter(inUnit)
+    .map(u => ({ ...u, st: unitStatus(year, round, u.ui, round), all: ROUNDS.map((_, ri) => unitStatus(year, ri, u.ui, round)) }))
+  return { year, round, unit, risks, kris, units }
+}
+function tasks(v) {
+  const by = s => v.units.filter(u => u.st === s)
+  const red = v.kris.filter(k => k.st === 'RED')
+  const late = v.risks.filter(k => delayed(k, v.round))
+  return [
+    { key: 'head', title: 'รอหัวหน้าหน่วยงานเห็นชอบ', sub: `${by('head').length} หน่วยงาน`, n: by('head').length, tag: ['รอเห็นชอบ', '#A66A00', '#FFF1D6'], open: () => openUnits('รอหัวหน้าหน่วยงานเห็นชอบ', by('head')) },
+    { key: 'plan', title: 'รอกองแผนงานรับรอง', sub: `${by('plan').length} หน่วยงาน · รับรองแล้วล็อกข้อมูล`, n: by('plan').length, tag: ['รอรับรอง', '#4B2FD1', '#ECE6FF'], open: () => openUnits('รอกองแผนงานรับรอง', by('plan')) },
+    { key: 'back', title: 'ตีกลับให้แก้ไขแล้วส่งใหม่', sub: `${by('back').length} หน่วยงาน`, n: by('back').length, tag: ['ตีกลับ', '#B81A55', '#FFE0E8'], open: () => openUnits('ตีกลับให้แก้ไข', by('back')) },
+    { key: 'red', title: 'KRI ระดับ RED — แจ้ง Risk Owner', sub: `${red.length} ตัวชี้วัด`, n: red.length, tag: ['เร่งด่วน', '#fff', 'var(--lv-vhigh)'], open: () => openKris('KRI ระดับ RED', red) },
+    { key: 'late', title: 'มาตรการล่าช้ากว่าแผน (ปค.5)', sub: `${late.length} มาตรการ`, n: late.length, tag: ['ติดตาม', '#A66A00', '#FFF1D6'], open: () => openRisks('มาตรการล่าช้ากว่าแผน', late) },
+    { key: 'due', title: `ครบกำหนดส่งรอบ${ROUNDS[v.round].label}`, sub: `ภายใน ${ROUNDS[v.round].due(v.year)} · ยังไม่ส่ง ${v.units.filter(u => ['none', 'draft', 'back'].includes(u.st)).length} หน่วยงาน`, n: 0, tag: ['กำหนดการ', 'var(--text2)', 'var(--selected)'], open: () => openUnits('หน่วยงานที่ยังไม่ส่ง', v.units.filter(u => ['none', 'draft', 'back'].includes(u.st))) }
+  ]
+}
+
+/* ════ SHELL ════ */
 function currentItem() {
   const all = MENU.flatMap(g => g.children)
   return all.find(i => i.href === location.hash) || all[0]
 }
-
 function renderMenu() {
   const active = currentItem()
+  // Badge = items waiting on someone's action (approvals, returns, RED KRIs) — not every delayed measure
+  const taskCount = tasks(view()).filter(t => ['head', 'plan', 'back', 'red'].includes(t.key)).reduce((a, t) => a + t.n, 0)
   $('#menu').innerHTML = MENU
     .filter(g => RANK[state.role] >= RANK[g.minRole || 'user'])
     .map(g => {
-      const hasActive = g.children.includes(active)
-      const open = hasActive || !state.closed.includes(g.label)
+      const open = g.children.includes(active) || !state.closed.includes(g.label)
       return `<li class="group${open ? ' open' : ''}" data-group="${esc(g.label)}">
         <button class="group-btn" aria-expanded="${open}"><i class="${g.icon}"></i><span class="label">${esc(g.label)}</span><i class="ri-arrow-right-s-line chev"></i></button>
-        <ul>${g.children.map(i => `<li><a class="item${i === active ? ' active' : ''}" href="${i.href}">
-          <i class="ri-circle-line"></i><span class="label">${esc(i.label)}</span>${i.public ? '<span class="chip">สาธารณะ</span>' : ''}</a></li>`).join('')}</ul>
+        <ul>${g.children.map(i => `<li><a class="item${i === active ? ' active' : ''}" href="${i.href}"${i === active ? ' aria-current="page"' : ''}>
+          <i class="${i.icon}"></i><span class="label">${esc(i.label)}</span>${i.badge ? `<span class="count">${taskCount}</span>` : ''}${i.public ? '<span class="chip">สาธารณะ</span>' : ''}</a></li>`).join('')}</ul>
       </li>`
     }).join('')
-  $('#page-title').textContent = active.label
+  $('#bell-count').textContent = taskCount
   document.title = `${active.label} | ${CONFIG.name}`
+  renderFoot()
+  renderPage(active)
+}
+function renderFoot() {
+  const v = view(), sent = v.units.filter(u => !['none', 'draft'].includes(u.st)).length
+  const pct = Math.round(sent / Math.max(1, v.units.length) * 100)
+  $('#nav-foot').innerHTML = `<div class="round-card"><small>รอบรายงานที่เลือก</small>
+    <b>ปีงบ ${v.year} · รอบ${ROUNDS[v.round].label}</b>
+    <div class="bar"><span style="inline-size:${pct}%"></span></div>
+    <small>ส่งแล้ว ${pct}% · ครบกำหนด ${ROUNDS[v.round].due(v.year)}</small></div>`
 }
 
 $('#menu').addEventListener('click', e => {
@@ -260,6 +528,268 @@ $('#menu').addEventListener('click', e => {
   if (e.target.closest('.item')) document.body.classList.remove('drawer')
 })
 
+/* ════ PAGES ════ */
+let drills = {} // data-drill key → handler, rebuilt on every render
+
+function renderPage(active) {
+  drills = {}
+  if (active.href === '#dashboard') return renderDashboard()
+  $('#content').innerHTML = `<div class="card"><h1>${esc(active.label)}</h1>
+    <div class="empty"><i class="ri-draft-line"></i>หน้านี้ยังอยู่ระหว่างออกแบบ — mockup รอบนี้ทำเฉพาะหน้า "แดชบอร์ดภาพรวม"<br><br>
+    <a class="btn-primary" href="#dashboard"><i class="ri-dashboard-3-line"></i>ไปที่แดชบอร์ด</a></div></div>`
+}
+
+function renderDashboard() {
+  const v = view(), f = state.f
+  const res = v.risks.map(k => ({ k, s: scoreAt(k, v.round) }))
+  const cnt = name => res.filter(x => level(x.s).name === name).length
+  const sent = v.units.filter(u => !['none', 'draft'].includes(u.st))
+  const pctSent = Math.round(sent.length / Math.max(1, v.units.length) * 100)
+  const red = v.kris.filter(k => k.st === 'RED'), amber = v.kris.filter(k => k.st === 'AMBER')
+  const late = v.risks.filter(k => delayed(k, v.round))
+  const avgProg = Math.round(v.risks.reduce((a, k) => a + progress(k, v.round), 0) / Math.max(1, v.risks.length))
+  const T = tasks(v), pending = T.slice(0, 3).reduce((a, t) => a + t.n, 0)
+  const unitLabel = f.unit === 'all' ? `ทั้งมหาวิทยาลัย (${UNITS.length} หน่วยงาน)` : UNITS[f.unit]
+
+  drills.kpi1 = () => openRisks('ความเสี่ยงที่ขึ้นทะเบียน (ERM1)', v.risks)
+  drills.kpi2 = () => openUnits(`สถานะการส่ง รอบ${ROUNDS[v.round].label}`, v.units)
+  drills.kpi3 = () => openKris('KRI ที่เกินเกณฑ์หรือใกล้เกณฑ์', [...red, ...amber])
+  drills.kpi4 = () => openRisks('มาตรการล่าช้ากว่าแผน (ปค.5)', late)
+  drills.kpi5 = () => openUnits('รายการรอเห็นชอบ / รอรับรอง / ตีกลับ', v.units.filter(u => ['head', 'plan', 'back'].includes(u.st)))
+  drills.allKri = () => openKris('KRI ทั้งหมด', v.kris)
+  drills.allRisk = () => openRisks('ทะเบียนความเสี่ยงทั้งหมด', [...v.risks].sort((a, b) => scoreAt(b, v.round) - scoreAt(a, v.round)))
+  T.forEach(t => { drills['task-' + t.key] = t.open })
+
+  const kpi = (key, grad, over, title, icon, val, sub, bar) => `
+    <button class="kpi" style="background:linear-gradient(135deg,${grad})" data-drill="${key}">
+      <div class="k-top"><div><small>${over}</small><div class="k-title">${title}</div></div><span class="k-ico"><i class="${icon}"></i></span></div>
+      <div class="k-val">${val}</div>${bar != null ? `<div class="bar"><span style="inline-size:${bar}%"></span></div>` : ''}<div class="k-sub">${sub}</div>
+    </button>`
+
+  // Heatmap: rows = likelihood 5→1, cols = impact 1→5
+  const heatPos = k => f.heat === 'inh' ? { L: k.L, I: k.I } : residual(k, v.round)
+  let heat = ''
+  for (let L = 5; L >= 1; L--) {
+    heat += `<div class="ax">${L}</div>`
+    for (let I = 1; I <= 5; I++) {
+      const list = v.risks.filter(k => { const p = heatPos(k); return p.L === L && p.I === I })
+      const key = `h${L}${I}`
+      drills[key] = () => openRisks(`ความเสี่ยงในช่อง โอกาส ${L} × ผลกระทบ ${I} (${f.heat === 'inh' ? 'Inherent' : 'Residual'})`, list)
+      heat += `<button class="cell${list.length ? '' : ' zero'}" style="background:${level(L * I).c}" data-drill="${key}" aria-label="โอกาส ${L} ผลกระทบ ${I}: ${list.length} รายการ"><b>${list.length}</b><small>คะแนน ${L * I}</small></button>`
+    }
+  }
+  heat += '<div></div>' + [1, 2, 3, 4, 5].map(i => `<div class="ax">${i}</div>`).join('')
+
+  const kriList = [...red, ...amber].slice(0, 5)
+  kriList.forEach((k, i) => { drills['kri' + i] = () => openKri(k) })
+
+  // Donut by category
+  const byCat = CATS.map((c, ci) => ({ ...c, ci, list: v.risks.filter(k => k.cat === ci) }))
+  const C = 2 * Math.PI * 60, total = Math.max(1, v.risks.length)
+  let off = 0
+  const segs = byCat.map(c => {
+    drills['cat' + c.ci] = () => openRisks(`ความเสี่ยงด้าน${c.name}`, c.list)
+    const len = c.list.length / total * C
+    const s = `<circle class="seg" data-drill="cat${c.ci}" cx="80" cy="80" r="60" fill="none" stroke="${c.color}" stroke-width="26"
+      stroke-dasharray="${len} ${C - len}" stroke-dashoffset="${-off}" transform="rotate(-90 80 80)"><title>${c.name}: ${c.list.length}</title></circle>`
+    off += len
+    return s
+  }).join('')
+
+  // Status legend counts for the selected round
+  const stCounts = Object.keys(STATUS).filter(s => s !== 'closed').map(s => ({ s, list: v.units.filter(u => u.st === s) })).filter(x => x.list.length)
+  stCounts.forEach(x => { drills['st-' + x.s] = () => openUnits(`${STATUS[x.s].label} — รอบ${ROUNDS[v.round].label}`, x.list) })
+  v.units.forEach(u => { drills['u' + u.ui] = () => openRisks(`ความเสี่ยงของ${u.name}`, v.risks.filter(k => k.ui === u.ui)) })
+
+  const top = [...v.risks].sort((a, b) => scoreAt(b, v.round) - scoreAt(a, v.round) || b.L * b.I - a.L * a.I).slice(0, 5)
+  top.forEach(k => { drills['r-' + k.id] = () => openRisk(k) })
+
+  $('#content').innerHTML = `
+  <div class="page-head">
+    <div><div class="crumb">หน้าแรก › ภาพรวม</div>
+      <h1>ภาพรวมความเสี่ยงมหาวิทยาลัย</h1>
+      <p class="muted">ปีงบประมาณ ${v.year} · รอบ${ROUNDS[v.round].label} · ${esc(unitLabel)}</p></div>
+    <div class="filters">
+      <select id="f-year" aria-label="ปีงบประมาณ">${[2568, 2569, 2570].map(y => `<option value="${y}"${y === f.year ? ' selected' : ''}>ปีงบ ${y}</option>`).join('')}</select>
+      <select id="f-round" aria-label="รอบรายงาน">${ROUNDS.map((r, i) => `<option value="${i}"${i === f.round ? ' selected' : ''}>รอบ${r.label}</option>`).join('')}</select>
+      <select id="f-unit" aria-label="หน่วยงาน"><option value="all">ทุกหน่วยงาน</option>${UNITS.map((u, i) => `<option value="${i}"${String(i) === String(f.unit) ? ' selected' : ''}>${u}</option>`).join('')}</select>
+      <button class="btn-primary" id="export"><i class="ri-file-excel-2-line"></i>ส่งออก Excel</button>
+    </div>
+  </div>
+
+  <div class="kpis">
+    ${kpi('kpi1', '#14A08C,#0B7C6E', 'ERM1 · ทะเบียนความเสี่ยง', 'ความเสี่ยงที่ขึ้นทะเบียน', 'ri-file-list-3-line', v.risks.length, `สูงมาก ${cnt('สูงมาก')} · สูง ${cnt('สูง')} · ปานกลาง ${cnt('ปานกลาง')}`)}
+    ${kpi('kpi2', '#F2A93B,#DB8414', 'ERM2 · การส่งข้อมูล', 'หน่วยงานส่งข้อมูลแล้ว', 'ri-send-plane-line', `${pctSent}<span>%</span>`, `ส่งแล้ว ${sent.length} / ${v.units.length} หน่วยงาน`, pctSent)}
+    ${kpi('kpi3', '#1E6FD9,#1553A8', 'ERM4 · KRI', 'ตัวชี้วัดเตือนภัยล่วงหน้า', 'ri-pulse-line', `${red.length + amber.length}<span> / ${v.kris.length}</span>`, `เกินเกณฑ์ (RED) ${red.length} · ใกล้เกณฑ์ (AMBER) ${amber.length}`)}
+    ${kpi('kpi4', '#8A5A33,#5C3B1F', 'ปค.5 · มาตรการ', 'ความคืบหน้ามาตรการเฉลี่ย', 'ri-loop-right-line', `${avgProg}<span>%</span>`, `ล่าช้ากว่าแผน ${late.length} มาตรการ`, avgProg)}
+    ${kpi('kpi5', '#E5266E,#B81A55', 'Workflow', 'รอพิจารณา / ตีกลับ', 'ri-inbox-unarchive-line', pending, `รอเห็นชอบ ${T[0].n} · รอรับรอง ${T[1].n} · ตีกลับ ${T[2].n}`)}
+  </div>
+
+  <div class="row">
+    <section class="card">
+      <div class="panel-head">
+        <div><h2>Risk Heatmap 5×5 — ${f.heat === 'inh' ? 'ก่อนควบคุม (Inherent)' : 'หลังควบคุม (Residual)'}</h2><p>คลิกช่องเพื่อดูรายการความเสี่ยง · คะแนน = โอกาส × ผลกระทบ</p></div>
+        <div class="seg" role="group" aria-label="ประเภทคะแนน">
+          <button data-heat="inh" class="${f.heat === 'inh' ? 'on' : ''}">Inherent</button><button data-heat="res" class="${f.heat === 'res' ? 'on' : ''}">Residual</button>
+        </div>
+      </div>
+      <div class="legend" style="margin-block-end:12px">
+        <span class="lv" style="background:var(--lv-low)">ต่ำ 1–4</span><span class="lv" style="background:var(--lv-mid)">ปานกลาง 5–9</span>
+        <span class="lv" style="background:var(--lv-high)">สูง 10–15</span><span class="lv" style="background:var(--lv-vhigh)">สูงมาก 16–25</span>
+      </div>
+      <div class="heat">${heat}</div>
+      <div class="ax-title">ผลกระทบ (Impact) → &nbsp;·&nbsp; ↑ โอกาสเกิด (Likelihood)</div>
+    </section>
+
+    <section class="card">
+      <div class="panel-head"><h2>KRI ที่ต้องเฝ้าระวัง</h2><button class="link" data-drill="allKri">ดูทั้งหมด →</button></div>
+      ${kriList.length ? kriList.map((k, i) => `
+        <button class="kri" style="border-color:${KRI_C[k.st]}" data-drill="kri${i}">
+          <div class="t"><span>${esc(k.name)}</span><span class="tag" style="background:${KRI_C[k.st]}">${k.st}</span></div>
+          <small>ค่าจริง ${k.v} ${k.unit} · เกณฑ์ ${k.dir === 'min' ? '≥' : '≤'} ${k.thr} ${k.unit} · ${esc(k.unit_)}</small>
+        </button>`).join('') : '<div class="empty"><i class="ri-checkbox-circle-line"></i>ไม่มี KRI ที่เกินหรือใกล้เกณฑ์ในรอบนี้</div>'}
+    </section>
+  </div>
+
+  <div class="row">
+    <section class="card">
+      <div class="panel-head"><div><h2>สถานะการส่งข้อมูล หน่วยงาน × รอบ</h2><p>รอบ${ROUNDS[v.round].label} ครบกำหนด ${ROUNDS[v.round].due(v.year)} · คลิกชื่อหน่วยงานเพื่อดูความเสี่ยง</p></div></div>
+      <div class="st-legend">${stCounts.map(x => `<button data-drill="st-${x.s}">${pill(x.s)}<b>${x.list.length}</b></button>`).join('')}</div>
+      <div class="scroll"><table class="matrix">
+        <thead><tr><th>หน่วยงาน</th>${ROUNDS.map((r, i) => `<th${i === v.round ? ' style="color:var(--primary)"' : ''}>${r.short}</th>`).join('')}</tr></thead>
+        <tbody>${v.units.map(u => `<tr><td><button class="link" style="color:inherit;font-weight:500" data-drill="u${u.ui}">${esc(u.name)}</button></td>${u.all.map(s => `<td>${pill(s)}</td>`).join('')}</tr>`).join('')}</tbody>
+      </table></div>
+    </section>
+
+    <section class="card">
+      <div class="panel-head"><h2>ความเสี่ยงแยกตามประเภท</h2></div>
+      <div class="donut-wrap">
+        <svg class="donut" viewBox="0 0 160 160" width="190" height="190" role="img" aria-label="สัดส่วนความเสี่ยงตามประเภท">
+          ${segs}<text x="80" y="78" text-anchor="middle" font-size="26" font-weight="800" fill="currentColor">${v.risks.length}</text>
+          <text x="80" y="98" text-anchor="middle" font-size="11" fill="currentColor" opacity=".6">ความเสี่ยง</text>
+        </svg>
+        <div class="dlegend">${byCat.map(c => `<button data-drill="cat${c.ci}"><span class="dot" style="background:${c.color}"></span>${c.name} <b style="margin-inline-start:auto">${c.list.length}</b></button>`).join('')}</div>
+      </div>
+    </section>
+  </div>
+
+  <div class="row">
+    <section class="card">
+      <div class="panel-head"><h2>Top 5 ความเสี่ยงคงเหลือสูงสุด</h2><button class="link" data-drill="allRisk">ทะเบียนความเสี่ยง →</button></div>
+      ${riskTable(top, v.round)}
+    </section>
+    <section class="card">
+      <div class="panel-head"><h2>งานที่ต้องดำเนินการ</h2></div>
+      ${T.map(t => `<button class="task" data-drill="task-${t.key}">
+        <div class="t"><span>${esc(t.title)}</span><span class="tag" style="color:${t.tag[1]};background:${t.tag[2]}">${t.tag[0]}</span></div>
+        <small>${esc(t.sub)}</small></button>`).join('')}
+    </section>
+  </div>`
+}
+
+function riskTable(list, round) {
+  if (!list.length) return '<div class="empty"><i class="ri-inbox-line"></i>ไม่พบรายการความเสี่ยงตามเงื่อนไขนี้</div>'
+  return `<div class="scroll"><table class="tbl"><thead><tr><th>รหัส</th><th>ความเสี่ยง</th><th>หน่วยงาน</th><th>Inherent</th><th>Residual</th><th>แนวโน้ม</th></tr></thead>
+    <tbody>${list.map(k => `<tr data-risk="${k.id}">
+      <td data-h="รหัส" class="mono">${k.id}</td><td data-h="ความเสี่ยง">${esc(k.name)}</td><td data-h="หน่วยงาน">${esc(k.unit)}</td>
+      <td data-h="Inherent">${scoreChip(k.L * k.I)}</td><td data-h="Residual">${scoreChip(scoreAt(k, round))}</td><td data-h="แนวโน้ม">${trendIcon(trend(k, round))}</td></tr>`).join('')}</tbody></table></div>`
+}
+
+/* ════ DRILL-DOWN MODALS ════ */
+const modal = $('#modal')
+function openModal(title, html) { $('#modal-title').textContent = title; $('#modal-body').innerHTML = html; if (!modal.open) modal.showModal() }
+$('#modal-close').addEventListener('click', () => modal.close())
+modal.addEventListener('click', e => { if (e.target === modal) modal.close() })
+
+// Paginated list inside the modal; render(rows) returns the table HTML for one page
+function openPaged(title, rows, render, per = 10) {
+  let page = 0
+  const draw = () => {
+    const pages = Math.max(1, Math.ceil(rows.length / per))
+    openModal(title, (rows.length ? render(rows.slice(page * per, page * per + per)) : render([])) +
+      (rows.length > per ? `<div class="pager"><span>แสดง ${page * per + 1}–${Math.min(rows.length, page * per + per)} จาก ${rows.length}</span>
+        <span><button data-pg="-1"${page ? '' : ' disabled'}>ก่อนหน้า</button> หน้า ${page + 1}/${pages} <button data-pg="1"${page < pages - 1 ? '' : ' disabled'}>ถัดไป</button></span></div>` : `<div class="pager"><span>ทั้งหมด ${rows.length} รายการ</span></div>`))
+    $('#modal-body').querySelectorAll('[data-pg]').forEach(b => b.onclick = () => { page += +b.dataset.pg; draw() })
+  }
+  draw()
+}
+const openRisks = (title, list) => openPaged(title, list, rows => riskTable(rows, state.f.round))
+function openUnits(title, list) {
+  openPaged(title, list, rows => rows.length ? `<table class="tbl"><thead><tr><th>หน่วยงาน</th><th>สถานะรอบ${ROUNDS[state.f.round].label}</th><th>จำนวนความเสี่ยง</th></tr></thead><tbody>
+    ${rows.map(u => `<tr data-unit="${u.ui}"><td data-h="หน่วยงาน">${esc(u.name)}</td><td data-h="สถานะ">${pill(u.st)}</td><td data-h="ความเสี่ยง">${yearData(state.f.year).risks.filter(k => k.ui === u.ui).length}</td></tr>`).join('')}</tbody></table>`
+    : '<div class="empty"><i class="ri-checkbox-circle-line"></i>ไม่มีหน่วยงานในสถานะนี้</div>')
+}
+function openKris(title, list) {
+  openPaged(title, list, rows => rows.length ? `<table class="tbl"><thead><tr><th>ตัวชี้วัด</th><th>หน่วยงาน</th><th>ค่าจริง</th><th>เกณฑ์</th><th>สถานะ</th></tr></thead><tbody>
+    ${rows.map(k => `<tr><td data-h="ตัวชี้วัด">${esc(k.name)}</td><td data-h="หน่วยงาน">${esc(k.unit_)}</td><td data-h="ค่าจริง">${k.v} ${k.unit}</td>
+      <td data-h="เกณฑ์">${k.dir === 'min' ? '≥' : '≤'} ${k.thr} ${k.unit}</td><td data-h="สถานะ"><span class="tag" style="background:${KRI_C[k.st]}">${k.st}</span></td></tr>`).join('')}</tbody></table>`
+    : '<div class="empty"><i class="ri-checkbox-circle-line"></i>ไม่มี KRI ตามเงื่อนไขนี้</div>')
+}
+function openKri(k) {
+  openModal(k.name, `<dl class="kv"><dt>หน่วยงาน</dt><dd>${esc(k.unit_)}</dd><dt>ค่าจริงรอบนี้</dt><dd><b>${k.v} ${k.unit}</b></dd>
+    <dt>เกณฑ์</dt><dd>${k.dir === 'min' ? 'ไม่ต่ำกว่า' : 'ไม่เกิน'} ${k.thr} ${k.unit}</dd><dt>สถานะ</dt><dd><span class="tag" style="background:${KRI_C[k.st]}">${k.st}</span></dd></dl>
+    <div class="rounds">${ROUNDS.map((r, i) => { const x = kriValue(k, state.f.year, i), s = kriStatus(k, x); return `<div><small class="muted">${r.label}</small><br><b style="color:${KRI_C[s]}">${x} ${k.unit}</b></div>` }).join('')}</div>`)
+}
+function openRisk(k) {
+  const round = state.f.round, p = progress(k, round)
+  openModal(`${k.id} · ${k.name}`, `<dl class="kv">
+    <dt>หน่วยงาน</dt><dd>${esc(k.unit)}</dd><dt>ประเภท</dt><dd>${CATS[k.cat].name}</dd><dt>Risk Owner</dt><dd>${esc(k.owner)}</dd>
+    <dt>มาตรการ (ERM3)</dt><dd>${esc(k.measure)}</dd>
+    <dt>ความคืบหน้า</dt><dd><div style="display:flex;gap:8px;align-items:center"><div style="flex:1;block-size:8px;border-radius:4px;background:var(--selected);overflow:hidden"><span style="display:block;block-size:100%;inline-size:${p}%;background:${delayed(k, round) ? 'var(--lv-high)' : 'var(--lv-low)'}"></span></div><b>${p}%</b>${delayed(k, round) ? '<span class="tag" style="background:var(--lv-high)">ล่าช้า</span>' : ''}</div></dd></dl>
+    <div class="rounds"><div><small class="muted">Inherent</small><br>${scoreChip(k.L * k.I)}<br><small>L${k.L} × I${k.I}</small></div>
+    ${ROUNDS.map((r, i) => { const x = residual(k, i); return `<div${i === round ? ' style="border-color:var(--primary)"' : ''}><small class="muted">${r.label}</small><br>${scoreChip(x.L * x.I)}<br><small>L${x.L} × I${x.I}</small></div>` }).join('')}</div>`)
+}
+
+/* ════ EVENTS ════ */
+$('#content').addEventListener('click', e => {
+  const d = e.target.closest('[data-drill]'); if (d && drills[d.dataset.drill]) return drills[d.dataset.drill]()
+  const h = e.target.closest('[data-heat]'); if (h) { state.f.heat = h.dataset.heat; saveFilter() }
+  const r = e.target.closest('[data-risk]'); if (r) openRisk(yearData(state.f.year).risks.find(k => k.id === r.dataset.risk))
+  if (e.target.closest('#export')) exportCsv()
+})
+$('#modal-body').addEventListener('click', e => {
+  const r = e.target.closest('[data-risk]'); if (r) openRisk(yearData(state.f.year).risks.find(k => k.id === r.dataset.risk))
+  const u = e.target.closest('[data-unit]'); if (u) openRisks(`ความเสี่ยงของ${UNITS[u.dataset.unit]}`, yearData(state.f.year).risks.filter(k => k.ui === +u.dataset.unit))
+})
+$('#content').addEventListener('change', e => {
+  const id = e.target.id
+  if (id === 'f-year') state.f.year = +e.target.value
+  else if (id === 'f-round') state.f.round = +e.target.value
+  else if (id === 'f-unit') state.f.unit = e.target.value
+  else return
+  saveFilter()
+})
+function saveFilter() { store.set('dash-filter', state.f); renderMenu() }
+
+function toast(msg, icon = 'ri-checkbox-circle-line') {
+  const t = $('#toast'); t.innerHTML = `<i class="${icon}"></i>${esc(msg)}`; t.classList.add('show')
+  clearTimeout(toast.t); toast.t = setTimeout(() => t.classList.remove('show'), 2800)
+}
+function exportCsv() {
+  const v = view()
+  const rows = [['รหัส', 'ความเสี่ยง', 'ประเภท', 'หน่วยงาน', 'Risk Owner', 'Inherent', 'Residual', 'ระดับ', 'ความคืบหน้ามาตรการ (%)']]
+    .concat(v.risks.map(k => [k.id, k.name, CATS[k.cat].name, k.unit, k.owner, k.L * k.I, scoreAt(k, v.round), level(scoreAt(k, v.round)).name, progress(k, v.round)]))
+  const csv = '﻿' + rows.map(r => r.map(c => `"${String(c).replace(/"/g, '""')}"`).join(',')).join('\n')
+  const a = document.createElement('a')
+  a.href = URL.createObjectURL(new Blob([csv], { type: 'text/csv;charset=utf-8' }))
+  a.download = `e-risk-${v.year}-round${v.round}.csv`; a.click(); URL.revokeObjectURL(a.href)
+  toast(`ส่งออก ${v.risks.length} รายการแล้ว (เปิดด้วย Excel ได้)`)
+}
+
+$('#search').addEventListener('keydown', e => {
+  if (e.key !== 'Enter') return
+  const q = e.target.value.trim().toLowerCase()
+  if (!q) return toast('พิมพ์คำค้นก่อนกด Enter', 'ri-information-line')
+  const list = yearData(state.f.year).risks.filter(k => [k.id, k.name, k.unit].some(s => s.toLowerCase().includes(q)))
+  openRisks(`ผลการค้นหา "${e.target.value.trim()}"`, list)
+})
+$('#bell').addEventListener('click', () => {
+  const T = tasks(view())
+  openModal('งานที่ต้องดำเนินการ', T.map((t, i) => `<button class="task" data-task="${i}"><div class="t"><span>${esc(t.title)}</span><span class="tag" style="color:${t.tag[1]};background:${t.tag[2]}">${t.tag[0]}</span></div><small>${esc(t.sub)}</small></button>`).join(''))
+  $('#modal-body').querySelectorAll('[data-task]').forEach(b => b.onclick = () => T[b.dataset.task].open())
+})
+
+/* ════ SHELL EVENTS ════ */
 function renderRoles() {
   $('#roles').innerHTML = ROLES.map(r => `<button class="dd-item${r.value === state.role ? ' selected' : ''}" role="menuitemradio"
     aria-checked="${r.value === state.role}" data-role="${r.value}"><i class="${r.icon}"></i>${r.label}${r.value === state.role ? '<i class="ri-check-line"></i>' : ''}</button>`).join('')

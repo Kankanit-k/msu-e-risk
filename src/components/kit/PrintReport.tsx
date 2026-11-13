@@ -1,7 +1,7 @@
 'use client'
 
 // Printable report: hidden on screen, it is the only thing on paper when the user prints
-// (window.print() → "Save as PDF" gives a Thai PDF, since the browser renders the Sarabun web font).
+// (window.print() → "Save as PDF" gives a Thai PDF, since the browser renders the Mornamchi web font).
 // The rest of the page is hidden in print, the same way src/views/manual/Manual.tsx does it.
 import { useEffect, useState } from 'react'
 import type { ReactNode } from 'react'
@@ -38,7 +38,7 @@ const printStyles = (
           insetInlineStart: 0,
           inlineSize: '100%',
           color: '#000',
-          fontFamily: `var(--font-body), 'Sarabun', 'TH Sarabun New', sans-serif`,
+          fontFamily: `var(--font-main), 'Mornamchi', 'TH Sarabun New', sans-serif`,
           fontSize: '12pt'
         },
         '.print-report table': { inlineSize: '100%', borderCollapse: 'collapse' },

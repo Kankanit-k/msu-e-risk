@@ -4,6 +4,9 @@
 import Box from '@mui/material/Box'
 import Typography from '@mui/material/Typography'
 
+// Component Imports
+import Link from '@/components/Link'
+
 // Hook Imports
 import useVerticalNav from '@menu/hooks/useVerticalNav'
 
@@ -45,12 +48,40 @@ const SidebarFooter = () => {
         borderBlockStart: '1px solid var(--mui-palette-divider)'
       }}
     >
+      {/* User manual (same spot as the old e-Risk system) */}
+      <Box
+        component={Link}
+        href='/manual'
+        sx={{
+          display: 'flex',
+          alignItems: 'center',
+          gap: '10px',
+          padding: '12px',
+          marginBlockEnd: '12px',
+          borderRadius: '10px',
+          backgroundColor: 'var(--mui-palette-primary-lightOpacity)',
+          color: 'primary.main',
+          '&:hover': { backgroundColor: 'var(--mui-palette-primary-mainOpacity)' }
+        }}
+      >
+        <i className='ri-book-open-line' style={{ fontSize: '1.5rem' }} />
+        <Typography sx={{ fontSize: '0.85rem', fontWeight: 700, color: 'inherit', textDecoration: 'underline' }}>
+          คู่มือการใช้งานระบบ
+        </Typography>
+      </Box>
+
       {/* Developer credits */}
       <Typography sx={sectionLabelSx}>ผู้พัฒนาระบบ</Typography>
       {developers.map(dev => (
         <Box
           key={dev.role}
-          sx={{ display: 'flex', alignItems: 'flex-start', gap: '8px', marginBlockEnd: '8px', '&:last-of-type': { marginBlockEnd: 0 } }}
+          sx={{
+            display: 'flex',
+            alignItems: 'flex-start',
+            gap: '8px',
+            marginBlockEnd: '8px',
+            '&:last-of-type': { marginBlockEnd: 0 }
+          }}
         >
           <Box
             sx={{
@@ -72,9 +103,7 @@ const SidebarFooter = () => {
             <Typography sx={{ fontSize: '0.75rem', fontWeight: 700, lineHeight: 1.3, color: 'text.primary' }}>
               {dev.name}
             </Typography>
-            <Typography sx={{ fontSize: '0.625rem', lineHeight: 1.3, color: 'text.secondary' }}>
-              {dev.role}
-            </Typography>
+            <Typography sx={{ fontSize: '0.625rem', lineHeight: 1.3, color: 'text.secondary' }}>{dev.role}</Typography>
           </Box>
         </Box>
       ))}

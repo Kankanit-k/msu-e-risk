@@ -19,9 +19,9 @@ type StyledNavHeaderProps = {
 }
 
 const StyledNavHeader = styled.div<StyledNavHeaderProps>`
-  padding: 15px;
-  padding-inline-start: 20px;
+  padding: 15px 12px;
   display: flex;
+  gap: 8px;
   align-items: center;
   justify-content: space-between;
   transition: ${({ transitionDuration }) => `padding-inline ${transitionDuration}ms ease-in-out`};

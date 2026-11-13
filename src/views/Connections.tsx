@@ -20,9 +20,17 @@ import Typography from '@mui/material/Typography'
 
 const basePath = process.env.NEXT_PUBLIC_BASEPATH?.startsWith('/') ? process.env.NEXT_PUBLIC_BASEPATH : ''
 
-type Grant = { id: string; client: string; scopes: string[]; createdAt: string; lastUsedAt?: string; revokedAt?: string }
+type Grant = {
+  id: string
+  client: string
+  scopes: string[]
+  createdAt: string
+  lastUsedAt?: string
+  revokedAt?: string
+}
 
-const fmt = (iso?: string) => (iso ? new Date(iso).toLocaleString('th-TH', { dateStyle: 'medium', timeStyle: 'short' }) : '—')
+const fmt = (iso?: string) =>
+  iso ? new Date(iso).toLocaleString('th-TH', { dateStyle: 'medium', timeStyle: 'short' }) : '—'
 
 const Connections = () => {
   const [grants, setGrants] = useState<Grant[] | null>(null)
@@ -72,7 +80,8 @@ const Connections = () => {
         )}
         {grants !== null && active.length === 0 && (
           <Typography color='text.secondary'>
-            ยังไม่มีการเชื่อมต่อ เมื่อคุณอนุญาตให้ chatbot เช่น Claude หรือ LINE ของมหาวิทยาลัยเข้าถึงระบบ รายการจะแสดงที่นี่
+            ยังไม่มีการเชื่อมต่อ เมื่อคุณอนุญาตให้ chatbot เช่น Claude หรือ LINE ของมหาวิทยาลัยเข้าถึงระบบ
+            รายการจะแสดงที่นี่
           </Typography>
         )}
         {active.map(g => (
@@ -80,7 +89,11 @@ const Connections = () => {
             <div className='flex flex-col gap-1'>
               <div className='flex items-center gap-2'>
                 <Typography className='font-medium'>{g.client}</Typography>
-                <Chip size='small' variant='outlined' label={g.scopes.includes('mcp:write') ? 'อ่าน + ขอแก้ไข' : 'อ่านอย่างเดียว'} />
+                <Chip
+                  size='small'
+                  variant='outlined'
+                  label={g.scopes.includes('mcp:write') ? 'อ่าน + ขอแก้ไข' : 'อ่านอย่างเดียว'}
+                />
               </div>
               <Typography variant='body2' color='text.secondary'>
                 อนุญาตเมื่อ {fmt(g.createdAt)} · ใช้ล่าสุด {fmt(g.lastUsedAt)}

@@ -1,45 +1,30 @@
 /*
- * Project fonts — mirrors the MSU-BEPS reference design.
+ * Project font — Mornamchi (Thai + Latin) for body text and headings alike.
  *
- *  - Body / UI text .......... Sarabun            (Thai + Latin, very readable)
- *  - Headings & numbers ...... Manrope            (Latin display) → falls back to
- *                              IBM Plex Sans Thai (Thai display)
- *
- * Self-hosted via `next/font/google` (no external <link> needed).
- * To change a font, swap the import + loader below and keep the exported
- * family strings — everything else (theme, layout) reads from these.
+ * Self-hosted from src/assets/fonts/mornamchi via `next/font/local` (no network needed at build).
+ * Weights available: 300 Light, 400 Regular, 700 Bold — other weights (500/600/800) are
+ * rounded by the browser to the nearest one.
+ * To change the font, swap the loader below and keep the exported family strings —
+ * everything else (theme, layout) reads from these.
  */
 
 // Next Imports
-import { Sarabun, IBM_Plex_Sans_Thai, Manrope } from 'next/font/google'
+import localFont from 'next/font/local'
 
-export const bodyFont = Sarabun({
-  subsets: ['thai', 'latin'],
-  weight: ['300', '400', '500', '600', '700'],
-  variable: '--font-body',
-  display: 'swap',
-  fallback: ['sans-serif']
-})
-
-// Manrope is a variable font → omit `weight` to load the full range.
-export const headingLatinFont = Manrope({
-  subsets: ['latin'],
-  variable: '--font-heading-latin',
-  display: 'swap',
-  fallback: ['sans-serif']
-})
-
-export const headingThaiFont = IBM_Plex_Sans_Thai({
-  subsets: ['thai', 'latin'],
-  weight: ['400', '500', '600', '700'],
-  variable: '--font-heading-thai',
+export const mainFont = localFont({
+  src: [
+    { path: '../../assets/fonts/mornamchi/Mornamchi-Light.woff2', weight: '300', style: 'normal' },
+    { path: '../../assets/fonts/mornamchi/Mornamchi-Regular.woff2', weight: '400', style: 'normal' },
+    { path: '../../assets/fonts/mornamchi/Mornamchi-Bold.woff2', weight: '700', style: 'normal' }
+  ],
+  variable: '--font-main',
   display: 'swap',
   fallback: ['sans-serif']
 })
 
 // Font-family stacks consumed by the MUI theme (see `@core/theme`).
-export const bodyFontFamily = `var(--font-body), 'Sarabun', sans-serif`
-export const headingFontFamily = `var(--font-heading-latin), var(--font-heading-thai), 'Manrope', 'IBM Plex Sans Thai', sans-serif`
+export const bodyFontFamily = `var(--font-main), 'Mornamchi', sans-serif`
+export const headingFontFamily = bodyFontFamily
 
-// CSS-variable classNames to attach to <body> so the @font-face rules load.
-export const fontVariables = `${bodyFont.variable} ${headingLatinFont.variable} ${headingThaiFont.variable}`
+// CSS-variable className to attach to <body> so the @font-face rules load.
+export const fontVariables = mainFont.variable

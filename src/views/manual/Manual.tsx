@@ -32,7 +32,9 @@ const printStyles = (
     styles={{
       '@media print': {
         'nav, header, footer, aside, .ts-vertical-nav-root, .no-print': { display: 'none !important' },
-        '.ts-vertical-layout-content-wrapper, .ts-horizontal-layout-content-wrapper': { marginInlineStart: '0 !important' },
+        '.ts-vertical-layout-content-wrapper, .ts-horizontal-layout-content-wrapper': {
+          marginInlineStart: '0 !important'
+        },
         '.manual-page': { breakBefore: 'page', boxShadow: 'none !important', border: 'none !important' },
         '.manual-page:first-of-type': { breakBefore: 'auto' },
         '.manual-step': { breakInside: 'avoid' }
@@ -54,11 +56,22 @@ const Manual = ({ pages, pdf }: { pages: ManualPage[]; pdf: string | null }) => 
           <Typography color='text.secondary'>{themeConfig.templateSubtitle}</Typography>
         </div>
         {pdf ? (
-          <Button className='no-print' variant='contained' href={pdf} download startIcon={<i className='ri-file-pdf-2-line' />}>
+          <Button
+            className='no-print'
+            variant='contained'
+            href={pdf}
+            download
+            startIcon={<i className='ri-file-pdf-2-line' />}
+          >
             ดาวน์โหลด PDF
           </Button>
         ) : (
-          <Button className='no-print' variant='contained' onClick={() => window.print()} startIcon={<i className='ri-printer-line' />}>
+          <Button
+            className='no-print'
+            variant='contained'
+            onClick={() => window.print()}
+            startIcon={<i className='ri-printer-line' />}
+          >
             พิมพ์ / บันทึกเป็น PDF
           </Button>
         )}
@@ -94,7 +107,13 @@ const Manual = ({ pages, pdf }: { pages: ManualPage[]; pdf: string | null }) => 
             </div>
 
             {p.video && (
-              <Box className='no-print' component='video' controls preload='metadata' sx={{ inlineSize: '100%', borderRadius: 1, bgcolor: 'black' }}>
+              <Box
+                className='no-print'
+                component='video'
+                controls
+                preload='metadata'
+                sx={{ inlineSize: '100%', borderRadius: 1, bgcolor: 'black' }}
+              >
                 <source src={p.video} type='video/mp4' />
                 {p.captions && <track kind='captions' srcLang='th' label='ไทย' src={p.captions} default />}
               </Box>

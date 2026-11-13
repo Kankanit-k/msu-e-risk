@@ -12,7 +12,7 @@ import spacing from './spacing'
 import shadows from './shadows'
 import customShadows from './customShadows'
 
-// Font Imports (Sarabun body + Manrope/IBM Plex Sans Thai headings) — see ./fonts
+// Font Imports (Mornamchi for body and headings) — see ./fonts
 import { bodyFontFamily, headingFontFamily } from './fonts'
 
 const theme = (settings: Settings, mode: SystemMode, direction: Theme['direction']): Theme => {
@@ -34,7 +34,7 @@ const theme = (settings: Settings, mode: SystemMode, direction: Theme['direction
     shadows: shadows(mode),
 
     typography: {
-      // Body / UI text → Sarabun. Headings → Manrope + IBM Plex Sans Thai (see ./fonts).
+      // Body and headings → Mornamchi (see ./fonts).
       fontFamily: bodyFontFamily,
 
       // Compact 14px base, matching the MSU-BEPS reference.

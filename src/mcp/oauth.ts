@@ -43,14 +43,17 @@ export const parseScopes = (raw: string | null | undefined): McpScope[] => {
 // ---- Registration (RFC 7591) -------------------------------------------------------------------
 
 export const registerClient = async (body: Record<string, unknown>): Promise<ClientRecord> => {
-  const redirects = Array.isArray(body.redirect_uris) ? body.redirect_uris.filter((u): u is string => typeof u === 'string') : []
+  const redirects = Array.isArray(body.redirect_uris)
+    ? body.redirect_uris.filter((u): u is string => typeof u === 'string')
+    : []
 
   if (redirects.length > 5) throw new OAuthError('invalid_redirect_uri', 'redirect_uris มากเกินไป')
   if (!redirects.length) throw new OAuthError('invalid_redirect_uri', 'ต้องระบุ redirect_uris')
 
   const rejected = redirects.filter(u => !isAllowedRedirect(u))
 
-  if (rejected.length) throw new OAuthError('invalid_redirect_uri', `redirect_uri ไม่อยู่ในรายการที่อนุญาต: ${rejected.join(', ')}`)
+  if (rejected.length)
+    throw new OAuthError('invalid_redirect_uri', `redirect_uri ไม่อยู่ในรายการที่อนุญาต: ${rejected.join(', ')}`)
 
   const client: ClientRecord = {
     client_id: newToken(16),
@@ -60,7 +63,10 @@ export const registerClient = async (body: Record<string, unknown>): Promise<Cli
   }
 
   await getStore().update(d => void d.clients.push(client))
-  logger.info('mcp client registered', { source: 'mcp', context: { audit: true, clientId: client.client_id, name: client.client_name, redirects } })
+  logger.info('mcp client registered', {
+    source: 'mcp',
+    context: { audit: true, clientId: client.client_id, name: client.client_name, redirects }
+  })
 
   return client
 }
@@ -88,7 +94,8 @@ export const validateAuthRequest = async (p: URLSearchParams): Promise<AuthReque
   if (!client.redirect_uris.includes(redirectUri) || !isAllowedRedirect(redirectUri))
     throw new OAuthError('invalid_request', 'redirect_uri ไม่ถูกต้อง')
 
-  if (p.get('response_type') !== 'code') throw new OAuthError('unsupported_response_type', 'รองรับเฉพาะ response_type=code')
+  if (p.get('response_type') !== 'code')
+    throw new OAuthError('unsupported_response_type', 'รองรับเฉพาะ response_type=code')
 
   const codeChallenge = p.get('code_challenge') ?? ''
 
@@ -101,19 +108,20 @@ export const validateAuthRequest = async (p: URLSearchParams): Promise<AuthReque
 export const issueCode = async (req: AuthRequest, caller: Caller, scopes: McpScope[]) => {
   const code = newToken()
 
-  await getStore().update(d =>
-    void d.codes.push({
-      hash: sha256(code),
-      grantDraft: {
-        clientId: req.client.client_id,
-        user: { userId: caller.userId, name: caller.name, email: caller.email, role: caller.role },
-        scopes,
-        createdAt: new Date().toISOString()
-      },
-      redirectUri: req.redirectUri,
-      codeChallenge: req.codeChallenge,
-      expiresAt: inFuture(TTL.code)
-    })
+  await getStore().update(
+    d =>
+      void d.codes.push({
+        hash: sha256(code),
+        grantDraft: {
+          clientId: req.client.client_id,
+          user: { userId: caller.userId, name: caller.name, email: caller.email, role: caller.role },
+          scopes,
+          createdAt: new Date().toISOString()
+        },
+        redirectUri: req.redirectUri,
+        codeChallenge: req.codeChallenge,
+        expiresAt: inFuture(TTL.code)
+      })
   )
 
   return code
@@ -168,7 +176,16 @@ export const exchangeCode = async (p: URLSearchParams) => {
 
   if (typeof grant === 'string') throw new OAuthError('invalid_grant', grant)
 
-  logger.info('mcp grant issued', { source: 'mcp', context: { audit: true, grantId: grant.id, clientId: grant.clientId, userId: grant.user.userId, scopes: grant.scopes } })
+  logger.info('mcp grant issued', {
+    source: 'mcp',
+    context: {
+      audit: true,
+      grantId: grant.id,
+      clientId: grant.clientId,
+      userId: grant.user.userId,
+      scopes: grant.scopes
+    }
+  })
 
   return tokenResponse(accessToken, refreshToken, grant.scopes)
 }
@@ -195,7 +212,9 @@ export const refresh = async (p: URLSearchParams) => {
 
     g.usedRefreshHashes = [...g.usedRefreshHashes, g.refreshHash].slice(-20)
     g.refreshHash = sha256(refreshToken)
-    g.refreshExpiresAt = new Date(Math.min(Date.now() + TTL.refreshToken, Date.parse(g.createdAt) + TTL.grantMax)).toISOString()
+    g.refreshExpiresAt = new Date(
+      Math.min(Date.now() + TTL.refreshToken, Date.parse(g.createdAt) + TTL.grantMax)
+    ).toISOString()
     g.lastUsedAt = new Date().toISOString()
     d.accessTokens.push({ hash: sha256(accessToken), grantId: g.id, expiresAt: inFuture(TTL.accessToken) })
 
@@ -203,7 +222,10 @@ export const refresh = async (p: URLSearchParams) => {
   })
 
   if (result.error === 'reuse')
-    logger.warn('mcp refresh token reuse — grant revoked', { source: 'mcp', context: { audit: true, grantId: result.grant.id, userId: result.grant.user.userId } })
+    logger.warn('mcp refresh token reuse — grant revoked', {
+      source: 'mcp',
+      context: { audit: true, grantId: result.grant.id, userId: result.grant.user.userId }
+    })
 
   if (result.error) throw new OAuthError('invalid_grant', 'refresh_token ไม่ถูกต้อง')
 

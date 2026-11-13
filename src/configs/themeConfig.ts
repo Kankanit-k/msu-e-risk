@@ -61,7 +61,7 @@ export type Config = {
 const templateName = 'MSU-E-RISK'
 
 const themeConfig: Config = {
-  templateOverline: '', // small line above the name
+  templateOverline: 'Mahasarakham University', // small line above the name
   templateName,
   templateSubtitle: 'ระบบบริหารความเสี่ยง มมส', // ⚠️ rename: full Thai system name, e.g. ระบบขอใช้รถ มมส
   homePageUrl: '/',
@@ -78,15 +78,15 @@ const themeConfig: Config = {
   compactContentWidth: 1440, // in px
   navbar: {
     type: 'fixed', // 'fixed', 'static'
-    contentWidth: 'compact', // 'compact', 'wide'
+    contentWidth: 'wide', // 'compact', 'wide'
     floating: false, //! true, false (This will not work in the Horizontal Layout)
     detached: true, //! true, false (This will not work in the Horizontal Layout or floating navbar is enabled)
     blur: true // true, false
   },
-  contentWidth: 'compact', // 'compact', 'wide'
+  contentWidth: 'wide', // 'compact', 'wide'
   footer: {
     type: 'static', // 'fixed', 'static'
-    contentWidth: 'compact', // 'compact', 'wide'
+    contentWidth: 'wide', // 'compact', 'wide'
     detached: true //! true, false (This will not work in the Horizontal Layout)
   },
   disableRipple: false, // true, false

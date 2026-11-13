@@ -32,10 +32,31 @@ type Props = {
   onChanged: (r: RequestRecord) => void
 }
 
-const actionText: Record<RequestAction, { title: string; body: string; label: string; done: string; color: 'primary' | 'error' }> = {
-  submit: { title: 'ส่งคำขอเพื่ออนุมัติ?', body: 'หลังส่งแล้วจะแก้ไขคำขอนี้ไม่ได้', label: 'ส่งคำขอ', done: 'ส่งคำขอแล้ว', color: 'primary' },
-  approve: { title: 'อนุมัติคำขอนี้?', body: 'ผู้ยื่นจะได้รับแจ้งผล และเปลี่ยนกลับไม่ได้', label: 'อนุมัติ', done: 'อนุมัติแล้ว', color: 'primary' },
-  reject: { title: 'ไม่อนุมัติคำขอนี้?', body: 'ระบุเหตุผลให้ผู้ยื่นทราบ', label: 'ไม่อนุมัติ', done: 'บันทึกผลไม่อนุมัติแล้ว', color: 'error' }
+const actionText: Record<
+  RequestAction,
+  { title: string; body: string; label: string; done: string; color: 'primary' | 'error' }
+> = {
+  submit: {
+    title: 'ส่งคำขอเพื่ออนุมัติ?',
+    body: 'หลังส่งแล้วจะแก้ไขคำขอนี้ไม่ได้',
+    label: 'ส่งคำขอ',
+    done: 'ส่งคำขอแล้ว',
+    color: 'primary'
+  },
+  approve: {
+    title: 'อนุมัติคำขอนี้?',
+    body: 'ผู้ยื่นจะได้รับแจ้งผล และเปลี่ยนกลับไม่ได้',
+    label: 'อนุมัติ',
+    done: 'อนุมัติแล้ว',
+    color: 'primary'
+  },
+  reject: {
+    title: 'ไม่อนุมัติคำขอนี้?',
+    body: 'ระบุเหตุผลให้ผู้ยื่นทราบ',
+    label: 'ไม่อนุมัติ',
+    done: 'บันทึกผลไม่อนุมัติแล้ว',
+    color: 'error'
+  }
 }
 
 const Row = ({ label, children }: { label: string; children: React.ReactNode }) => (
@@ -55,7 +76,12 @@ const RequestDetail = ({ request: r, canApprove, isOwner, onClose, onEdit, onCha
     setBusy(true)
 
     try {
-      onChanged(await callApi<RequestRecord>(`${api}/${r.id}`, { method: 'POST', body: JSON.stringify({ action: pending, note: note || undefined }) }))
+      onChanged(
+        await callApi<RequestRecord>(`${api}/${r.id}`, {
+          method: 'POST',
+          body: JSON.stringify({ action: pending, note: note || undefined })
+        })
+      )
       notifySuccess(actionText[pending].done)
       setPending(null)
       setNote('')
@@ -111,7 +137,11 @@ const RequestDetail = ({ request: r, canApprove, isOwner, onClose, onEdit, onCha
                   <Button variant='outlined' onClick={() => onEdit(r)} startIcon={<i className='ri-edit-line' />}>
                     แก้ไข
                   </Button>
-                  <Button variant='contained' onClick={() => setPending('submit')} startIcon={<i className='ri-send-plane-line' />}>
+                  <Button
+                    variant='contained'
+                    onClick={() => setPending('submit')}
+                    startIcon={<i className='ri-send-plane-line' />}
+                  >
                     ส่งคำขอ
                   </Button>
                 </>
@@ -121,7 +151,12 @@ const RequestDetail = ({ request: r, canApprove, isOwner, onClose, onEdit, onCha
                   <Button variant='outlined' color='error' onClick={() => setPending('reject')}>
                     ไม่อนุมัติ
                   </Button>
-                  <Button variant='contained' color='success' onClick={() => setPending('approve')} startIcon={<i className='ri-check-line' />}>
+                  <Button
+                    variant='contained'
+                    color='success'
+                    onClick={() => setPending('approve')}
+                    startIcon={<i className='ri-check-line' />}
+                  >
                     อนุมัติ
                   </Button>
                 </>

@@ -11,8 +11,8 @@ for Mahasarakham University (MSU) projects. It ships with:
 - A vertical **and** horizontal layout, a theme **Customizer**, and light/dark modes.
 - Cookie-persisted theme settings (mode, skin, layout, primary color).
 - NextAuth (ERP-MSU OAuth) wiring and a small Express + Prisma backend under `backend/`.
-- Brand defaults from the **MSU-BEPS** reference design: **Sarabun** body font,
-  **Manrope / IBM Plex Sans Thai** headings, and a **purple** primary (`#6D4CFF`).
+- Brand defaults: **Mornamchi** font (self-hosted, `src/assets/fonts/mornamchi`) for body and headings,
+  and a **purple** primary (`#6D4CFF`) from the MSU-BEPS reference design.
 
 ## Commands
 
@@ -43,8 +43,8 @@ on, whatever `.env.local` says. Set `SMOKE_BASE_URL` to test an already running 
 **CI** (`.github/workflows/ci.yml`) runs install → tsc → lint → build → smoke tests on every PR and on
 pushes to `main`, with dummy env values only.
 
-> Fonts are loaded with `next/font/google`, so **the first build needs network access** to
-> fetch Sarabun / Manrope / IBM Plex Sans Thai.
+> The Mornamchi font is self-hosted (`next/font/local`, files in `src/assets/fonts/mornamchi`), so
+> builds need no network for fonts.
 
 ## Project map
 
@@ -64,7 +64,7 @@ src/
     globals.css                Tailwind v4 layers + CSS variables
   @core/                       Template core — theme, hooks, settings, MUI overrides
     theme/index.ts             ★ Typography + shape + shadows wiring
-    theme/fonts.ts             ★ Font definitions (Sarabun / Manrope / IBM Plex Sans Thai)
+    theme/fonts.ts             ★ Font definition (Mornamchi via next/font/local)
     theme/colorSchemes.ts      ★ Full light/dark palettes
     styles/vertical/           ★ Sidebar item + section styling
     contexts/settingsContext   Default settings + cookie persistence
@@ -191,7 +191,7 @@ the runtime default (`settingsContext` → `primaryColor`) and overrides the pal
 consistency, mirror it in `src/@core/theme/colorSchemes.ts` (`primary.main/light/dark`).
 
 ### Change fonts or sizes
-All fonts live in `src/@core/theme/fonts.ts`. Swap the `next/font/google` loaders and keep the
+All fonts live in `src/@core/theme/fonts.ts`. Swap the `next/font/local` loader and keep the
 exported `bodyFontFamily` / `headingFontFamily` strings. Base font **size** and heading scale
 are in `src/@core/theme/index.ts` (`typography`).
 
@@ -315,6 +315,5 @@ else**; stale names leak into the browser tab, the sidebar, and the public home 
 
 - Settings (mode/skin/layout/primaryColor) are stored in a cookie and win over `themeConfig`.
 - Don't reference a route in menu data before its `page.tsx` exists (it will 404).
-- `next/font` needs network on first build; CI/offline builds must cache the fonts.
 - `package.sh` / `package.ps1` write `mui-template.tar.gz` at the repo root. It is a local packaging
   artifact, ignored by git (`*.tar.gz`) — never commit it.

@@ -110,7 +110,7 @@ const Navigation = (props: Props) => {
     >
       {/* Nav Header including Logo & nav toggle icons  */}
       <NavHeader>
-        <Link href='/'>
+        <Link href='/' className='min-is-0'>
           <Logo />
         </Link>
         {!(isCollapsed && !isHovered) && (
@@ -118,7 +118,7 @@ const Navigation = (props: Props) => {
             lockedIcon={<i className='ri-radio-button-line text-xl' />}
             unlockedIcon={<i className='ri-checkbox-blank-circle-line text-xl' />}
             closeIcon={<i className='ri-close-line text-xl' />}
-            className='text-textSecondary'
+            className='text-textSecondary shrink-0'
             onClick={() => updateSettings({ layout: !isCollapsed ? 'collapsed' : 'vertical' })}
           />
         )}

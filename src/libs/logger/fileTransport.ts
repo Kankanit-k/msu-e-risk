@@ -22,7 +22,8 @@ let handles: Handles | null = null
 let cleanupStamp = ''
 let disabledReason = ''
 
-const resolveDir = () => path.isAbsolute(loggerConfig.dir) ? loggerConfig.dir : path.join(process.cwd(), loggerConfig.dir)
+const resolveDir = () =>
+  path.isAbsolute(loggerConfig.dir) ? loggerConfig.dir : path.join(process.cwd(), loggerConfig.dir)
 
 const openStream = (dir: string, name: string) =>
   fs.createWriteStream(path.join(dir, name), { flags: 'a', encoding: 'utf8' })

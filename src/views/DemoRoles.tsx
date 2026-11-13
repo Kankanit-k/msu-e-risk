@@ -44,8 +44,8 @@ const DemoRoles = () => {
   if (!demoEnabled) {
     return (
       <Alert severity='info'>
-        โหมดสาธิตยังไม่ได้เปิดใช้งาน ผู้ดูแลระบบต้องตั้งค่า NEXT_PUBLIC_DEMO_MODE=true (ฝั่งไคลเอ็นต์) และ DEMO_MODE=true
-        (ฝั่งเซิร์ฟเวอร์) พร้อม NEXTAUTH_SECRET แล้วรีสตาร์ทเซิร์ฟเวอร์ ไม่ควรเปิดโหมดนี้บนระบบจริง
+        โหมดสาธิตยังไม่ได้เปิดใช้งาน ผู้ดูแลระบบต้องตั้งค่า NEXT_PUBLIC_DEMO_MODE=true (ฝั่งไคลเอ็นต์) และ
+        DEMO_MODE=true (ฝั่งเซิร์ฟเวอร์) พร้อม NEXTAUTH_SECRET แล้วรีสตาร์ทเซิร์ฟเวอร์ ไม่ควรเปิดโหมดนี้บนระบบจริง
       </Alert>
     )
   }
@@ -54,7 +54,10 @@ const DemoRoles = () => {
   const sessionUserId = (session?.user as { id?: unknown } | undefined)?.id
   const isDemoSession = typeof sessionUserId === 'string' && sessionUserId.startsWith('DEMO-')
   const isRealSession = !!session?.user && !isDemoSession
-  const activePersona = isDemoSession ? demoPersonas.find(p => sessionUserId.startsWith(`${p.persona.staffId}-`)) : undefined
+
+  const activePersona = isDemoSession
+    ? demoPersonas.find(p => sessionUserId.startsWith(`${p.persona.staffId}-`))
+    : undefined
 
   const selectRole = async (roleId: RoleId) => {
     setPendingId(roleId)
@@ -96,15 +99,13 @@ const DemoRoles = () => {
 
       {activePersona && (
         <Alert severity='info'>
-          กำลังใช้งานในฐานะ {activePersona.label}: {personaFullName(activePersona.persona)} ({activePersona.persona.position},{' '}
-          {activePersona.persona.unit})
+          กำลังใช้งานในฐานะ {activePersona.label}: {personaFullName(activePersona.persona)} (
+          {activePersona.persona.position}, {activePersona.persona.unit})
         </Alert>
       )}
 
       {isRealSession && (
-        <Alert severity='warning'>
-          คุณเข้าสู่ระบบด้วยบัญชีจริงอยู่ การเลือกบทบาทสาธิตจะแทนที่เซสชันปัจจุบัน
-        </Alert>
+        <Alert severity='warning'>คุณเข้าสู่ระบบด้วยบัญชีจริงอยู่ การเลือกบทบาทสาธิตจะแทนที่เซสชันปัจจุบัน</Alert>
       )}
 
       {error && <Alert severity='error'>{error}</Alert>}
@@ -118,7 +119,9 @@ const DemoRoles = () => {
             <Grid key={card.roleId} size={{ xs: 12, sm: 6, md: 3 }}>
               <Card sx={{ height: '100%', display: 'flex', flexDirection: 'column' }}>
                 <CardHeader
-                  avatar={<Box component='i' className={card.icon} sx={{ fontSize: 32, color: 'primary.main' }} aria-hidden />}
+                  avatar={
+                    <Box component='i' className={card.icon} sx={{ fontSize: 32, color: 'primary.main' }} aria-hidden />
+                  }
                   title={card.label}
                   slotProps={{ title: { variant: 'subtitle1' } }}
                 />
@@ -194,7 +197,13 @@ const DemoRoles = () => {
                       return (
                         <TableCell key={role.id} align='center'>
                           {allowed ? (
-                            <Box component='i' className='ri-check-line' sx={{ color: 'success.main' }} role='img' aria-label='อนุญาต' />
+                            <Box
+                              component='i'
+                              className='ri-check-line'
+                              sx={{ color: 'success.main' }}
+                              role='img'
+                              aria-label='อนุญาต'
+                            />
                           ) : (
                             <Typography component='span' color='text.disabled' aria-label='ไม่อนุญาต'>
                               -

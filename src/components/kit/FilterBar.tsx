@@ -5,6 +5,7 @@
 import { useState } from 'react'
 
 // MUI Imports
+import Autocomplete from '@mui/material/Autocomplete'
 import Badge from '@mui/material/Badge'
 import Box from '@mui/material/Box'
 import Button from '@mui/material/Button'
@@ -17,10 +18,13 @@ export type FilterField = {
   key: string
   label: string
 
-  /** 'search' = free-text box with an icon; 'select' needs options; 'date' = yyyy-mm-dd. */
-  type: 'search' | 'text' | 'select' | 'date'
+  /** 'search' = free-text box with an icon; 'select' / 'autocomplete' need options (autocomplete = type to find, for long lists); 'date' = yyyy-mm-dd. */
+  type: 'search' | 'text' | 'select' | 'autocomplete' | 'date'
   options?: { value: string; label: string }[]
   placeholder?: string
+
+  /** select only: a value is always set, so no "ทั้งหมด" option. */
+  required?: boolean
 }
 
 export type FilterValues = Record<string, string>
@@ -36,47 +40,66 @@ type Props = {
 const FilterBar = ({ fields, values, onChange }: Props) => {
   const [more, setMore] = useState(false)
   const set = (key: string, value: string) => onChange({ ...values, [key]: value })
-  const active = fields.filter(f => values[f.key])
+  const active = fields.filter(f => !f.required && values[f.key])
   const hidden = fields.slice(VISIBLE)
-  const hiddenActive = hidden.filter(f => values[f.key]).length
+  const hiddenActive = hidden.filter(f => !f.required && values[f.key]).length
 
-  const render = (f: FilterField) => (
-    <TextField
-      key={f.key}
-      size='small'
-      label={f.label}
-      placeholder={f.placeholder}
-      value={values[f.key] ?? ''}
-      onChange={e => set(f.key, e.target.value)}
-      select={f.type === 'select'}
-      type={f.type === 'date' ? 'date' : 'text'}
-      sx={{ minInlineSize: f.type === 'search' ? 240 : 180, flex: f.type === 'search' ? '1 1 240px' : '0 1 200px' }}
-      slotProps={{
-        inputLabel: f.type === 'date' ? { shrink: true } : undefined,
-        input:
-          f.type === 'search'
-            ? {
-                startAdornment: (
-                  <InputAdornment position='start'>
-                    <i className='ri-search-line' aria-hidden />
-                  </InputAdornment>
-                )
-              }
-            : undefined
-      }}
-    >
-      {f.type === 'select' && [
-        <MenuItem key='' value=''>
-          ทั้งหมด
-        </MenuItem>,
-        ...(f.options ?? []).map(o => (
-          <MenuItem key={o.value} value={o.value}>
-            {o.label}
-          </MenuItem>
-        ))
-      ]}
-    </TextField>
-  )
+  const render = (f: FilterField) =>
+    f.type === 'autocomplete' ? (
+      <Autocomplete
+        key={f.key}
+        size='small'
+        options={f.options ?? []}
+        value={(f.options ?? []).find(o => o.value === values[f.key]) ?? null}
+        onChange={(_, o) => set(f.key, o?.value ?? '')}
+        disableClearable={f.required}
+        noOptionsText='ไม่พบรายการ'
+        sx={{ minInlineSize: 260, flex: '1 1 320px' }}
+        renderInput={params => (
+          <TextField {...params} label={f.label} placeholder={f.placeholder ?? 'พิมพ์เพื่อค้นหา'} />
+        )}
+      />
+    ) : (
+      <TextField
+        key={f.key}
+        size='small'
+        label={f.label}
+        placeholder={f.placeholder}
+        value={values[f.key] ?? ''}
+        onChange={e => set(f.key, e.target.value)}
+        select={f.type === 'select'}
+        type={f.type === 'date' ? 'date' : 'text'}
+        sx={{ minInlineSize: f.type === 'search' ? 240 : 180, flex: f.type === 'search' ? '1 1 240px' : '0 1 200px' }}
+        slotProps={{
+          inputLabel: f.type === 'date' ? { shrink: true } : undefined,
+          input:
+            f.type === 'search'
+              ? {
+                  startAdornment: (
+                    <InputAdornment position='start'>
+                      <i className='ri-search-line' aria-hidden />
+                    </InputAdornment>
+                  )
+                }
+              : undefined
+        }}
+      >
+        {f.type === 'select' && [
+          ...(f.required
+            ? []
+            : [
+                <MenuItem key='' value=''>
+                  ทั้งหมด
+                </MenuItem>
+              ]),
+          ...(f.options ?? []).map(o => (
+            <MenuItem key={o.value} value={o.value}>
+              {o.label}
+            </MenuItem>
+          ))
+        ]}
+      </TextField>
+    )
 
   return (
     <Box role='search' className='no-print'>
@@ -95,7 +118,14 @@ const FilterBar = ({ fields, values, onChange }: Props) => {
           </Badge>
         )}
         {active.length > 0 && (
-          <Button variant='text' color='secondary' onClick={() => onChange({})} startIcon={<i className='ri-close-line' />}>
+          <Button
+            variant='text'
+            color='secondary'
+            onClick={() =>
+              onChange(Object.fromEntries(fields.filter(f => f.required).map(f => [f.key, values[f.key]])))
+            }
+            startIcon={<i className='ri-close-line' />}
+          >
             ล้างตัวกรอง
           </Button>
         )}

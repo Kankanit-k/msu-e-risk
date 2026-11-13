@@ -36,28 +36,35 @@ const tagPublic = (items: VerticalMenuDataType[]): VerticalMenuDataType[] =>
 const verticalMenuData = (role: AppRole = 'user'): VerticalMenuDataType[] => {
   const rank = accessLevelRank[role]
 
+  // Starting point mirrors the old e-Risk system menu (HOME / ความเสี่ยง / ควบคุมภายใน / ตั้งค่าระบบ).
   const menu: VerticalMenuDataType[] = [
-    // ── แดชบอร์ด / Dashboards (login) ───────────────────────────────
     {
-      label: 'แดชบอร์ด',
-      icon: 'ri-dashboard-line',
+      label: 'HOME',
+      isSection: true,
+      children: [{ label: 'Dashboard', href: '/', icon: 'ri-dashboard-line' }]
+    },
+    {
+      label: 'ความเสี่ยง',
       isSection: true,
       children: [
-        { label: 'หน้าแรก', href: '/', icon: 'ri-home-smile-line' },
-        { label: 'โปรไฟล์ของฉัน', href: '/home', icon: 'ri-user-3-line' },
-        { label: 'CRM', href: '/dashboards/crm', icon: 'ri-line-chart-line' },
-        { label: 'Analytics', href: '/dashboards/analytics', icon: 'ri-bar-chart-box-line' }
+        { label: 'SO', href: '/risk/so', icon: 'ri-star-line' },
+        { label: 'เป้าประสงค์', href: '/risk/goals', icon: 'ri-focus-3-line' },
+        { label: 'ERM1', href: '/risk/erm1', icon: 'ri-chat-search-line' },
+        { label: 'ERM2 - 3', href: '/risk/erm2-3', icon: 'ri-record-circle-line' },
+        { label: 'ERM4', href: '/risk/erm4', icon: 'ri-menu-2-line' }
       ]
     },
-
-    // ── ตาราง / Tables (login) ──────────────────────────────────────
     {
-      label: 'ตาราง',
-      icon: 'ri-table-2',
+      label: 'ควบคุมภายใน',
       isSection: true,
       children: [
-        { label: 'ผู้ใช้งาน', href: '/users', icon: 'ri-table-line' },
-        { label: 'คำขอ', href: '/requests', icon: 'ri-file-list-3-line' }
+        { label: 'ตั้งค่าข้อคำถาม', href: '/control/questions', icon: 'ri-equalizer-line' },
+        { label: 'ภาคผนวก ก.', href: '/control/appendix-a', icon: 'ri-file-text-line' },
+        { label: 'ปค. 4', href: '/control/pk4', icon: 'ri-file-list-2-line' },
+        { label: 'ภาคผนวก ข.', href: '/control/appendix-b', icon: 'ri-file-text-line' },
+        { label: 'ปค. 5', href: '/control/pk5', icon: 'ri-stack-line' },
+        { label: 'แบบติดตาม ปค. 5', href: '/control/pk5-followup', icon: 'ri-clipboard-line' },
+        { label: 'เอกสารเพื่อประเมินเบื้องต้น', href: '/control/documents', icon: 'ri-file-search-line' }
       ]
     }
   ]
@@ -85,12 +92,14 @@ const verticalMenuData = (role: AppRole = 'user'): VerticalMenuDataType[] => {
     })
   }
 
-  // ── อื่น ๆ / More (login) ───────────────────────────────────────────
-  menu.push({
-    label: 'อื่น ๆ',
-    isSection: true,
-    children: [{ label: 'เกี่ยวกับเรา', href: '/about', icon: 'ri-information-line' }]
-  })
+  // ── ตั้งค่าระบบ / System settings (กองแผนงาน = university admin) ─────
+  if (rank >= accessLevelRank.universityAdmin) {
+    menu.push({
+      label: 'ตั้งค่าระบบ',
+      isSection: true,
+      children: [{ label: 'เปิด-ปิด ระบบ', href: '/admin/university/system', icon: 'ri-toggle-line' }]
+    })
+  }
 
   // ── สาธิต / Demo (only when NEXT_PUBLIC_DEMO_MODE=true) ─────────────
   if (process.env.NEXT_PUBLIC_DEMO_MODE === 'true') {

@@ -53,7 +53,12 @@ const applyFilters = (rows: RequestRecord[], f: FilterValues) => {
 const today = () => new Date().toISOString().slice(0, 10)
 
 const formFields: FormField[] = [
-  { name: 'title', label: 'ชื่อคำขอ', required: true, validate: v => (v.trim().length < 3 ? 'อย่างน้อย 3 ตัวอักษร' : undefined) },
+  {
+    name: 'title',
+    label: 'ชื่อคำขอ',
+    required: true,
+    validate: v => (v.trim().length < 3 ? 'อย่างน้อย 3 ตัวอักษร' : undefined)
+  },
   { name: 'category', label: 'ประเภท', type: 'select', required: true, options: categories },
   {
     name: 'amount',
@@ -128,7 +133,13 @@ const Requests = () => {
   const selected = data?.items.find(r => r.id === selectedId) ?? null
 
   const replace = (rec: RequestRecord) =>
-    setData(d => d && { ...d, items: d.items.some(r => r.id === rec.id) ? d.items.map(r => (r.id === rec.id ? rec : r)) : [rec, ...d.items] })
+    setData(
+      d =>
+        d && {
+          ...d,
+          items: d.items.some(r => r.id === rec.id) ? d.items.map(r => (r.id === rec.id ? rec : r)) : [rec, ...d.items]
+        }
+    )
 
   const save = async (v: FormValues) => {
     const isNew = editing === 'new'
@@ -172,7 +183,12 @@ const Requests = () => {
   ]
 
   const createButton = (
-    <Button variant='contained' startIcon={<i className='ri-add-line' />} onClick={() => setEditing('new')} data-tour='requests-create'>
+    <Button
+      variant='contained'
+      startIcon={<i className='ri-add-line' />}
+      onClick={() => setEditing('new')}
+      data-tour='requests-create'
+    >
       สร้างคำขอ
     </Button>
   )
@@ -186,10 +202,22 @@ const Requests = () => {
             <Typography color='text.secondary'>ยื่นคำขอ ติดตามสถานะ และอนุมัติคำขอ</Typography>
           </Box>
           <Box sx={{ display: 'flex', flexWrap: 'wrap', gap: 2 }} data-tour='requests-export'>
-            <Button variant='outlined' color='secondary' startIcon={<i className='ri-file-excel-2-line' />} onClick={exportXlsx} disabled={!rows.length}>
+            <Button
+              variant='outlined'
+              color='secondary'
+              startIcon={<i className='ri-file-excel-2-line' />}
+              onClick={exportXlsx}
+              disabled={!rows.length}
+            >
               ส่งออก Excel
             </Button>
-            <Button variant='outlined' color='secondary' startIcon={<i className='ri-printer-line' />} onClick={() => window.print()} disabled={!rows.length}>
+            <Button
+              variant='outlined'
+              color='secondary'
+              startIcon={<i className='ri-printer-line' />}
+              onClick={() => window.print()}
+              disabled={!rows.length}
+            >
               พิมพ์รายงาน
             </Button>
             {createButton}
@@ -213,9 +241,17 @@ const Requests = () => {
             onRowClick={r => setSelectedId(r.id)}
             empty={
               data?.items.length ? (
-                <EmptyState icon='ri-filter-off-line' title='ไม่พบคำขอที่ตรงกับตัวกรอง' action={<Button onClick={() => setFilters({})}>ล้างตัวกรอง</Button>} />
+                <EmptyState
+                  icon='ri-filter-off-line'
+                  title='ไม่พบคำขอที่ตรงกับตัวกรอง'
+                  action={<Button onClick={() => setFilters({})}>ล้างตัวกรอง</Button>}
+                />
               ) : (
-                <EmptyState title='ยังไม่มีคำขอ' description='เริ่มจากสร้างคำขอแรก ระบบจะบันทึกเป็นร่างจนกว่าคุณจะกดส่ง' action={createButton} />
+                <EmptyState
+                  title='ยังไม่มีคำขอ'
+                  description='เริ่มจากสร้างคำขอแรก ระบบจะบันทึกเป็นร่างจนกว่าคุณจะกดส่ง'
+                  action={createButton}
+                />
               )
             }
           />
@@ -228,7 +264,11 @@ const Requests = () => {
         rows={rows}
         columns={reportColumns}
         getRowId={r => r.id}
-        footer={<p>รวม {rows.length} รายการ เป็นเงิน {baht(rows.reduce((s, r) => s + r.amount, 0))} บาท</p>}
+        footer={
+          <p>
+            รวม {rows.length} รายการ เป็นเงิน {baht(rows.reduce((s, r) => s + r.amount, 0))} บาท
+          </p>
+        }
       />
 
       <FormDialog

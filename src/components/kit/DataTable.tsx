@@ -60,7 +60,8 @@ type Props<T> = {
   pageSizes?: number[]
 }
 
-const cellValue = <T,>(row: T, col: Column<T>) => (col.sortValue ? col.sortValue(row) : ((row as Record<string, unknown>)[col.key] as string | number))
+const cellValue = <T,>(row: T, col: Column<T>) =>
+  col.sortValue ? col.sortValue(row) : ((row as Record<string, unknown>)[col.key] as string | number)
 
 const DataTable = <T,>({
   rows,
@@ -100,7 +101,11 @@ const DataTable = <T,>({
       const x = cellValue(a, col)
       const y = cellValue(b, col)
 
-      return (typeof x === 'number' && typeof y === 'number' ? x - y : String(x ?? '').localeCompare(String(y ?? ''), 'th')) * dir
+      return (
+        (typeof x === 'number' && typeof y === 'number'
+          ? x - y
+          : String(x ?? '').localeCompare(String(y ?? ''), 'th')) * dir
+      )
     })
   }, [rows, columns, sort])
 
@@ -115,9 +120,11 @@ const DataTable = <T,>({
   const toggleSort = (key: string) =>
     setSort(s => (s?.key === key ? { key, dir: s.dir === 'asc' ? 'desc' : 'asc' } : { key, dir: 'asc' }))
 
-  const cell = (row: T, col: Column<T>) => (col.render ? col.render(row) : String((row as Record<string, unknown>)[col.key] ?? ''))
+  const cell = (row: T, col: Column<T>) =>
+    col.render ? col.render(row) : String((row as Record<string, unknown>)[col.key] ?? '')
 
-  const pagination = (
+  // No pager when everything fits on the smallest page
+  const pagination = sorted.length > pageSizes[0] && (
     <TablePagination
       component='div'
       className='no-print'
@@ -160,7 +167,10 @@ const DataTable = <T,>({
                   ))}
               </Stack>
               {actions && (
-                <Box sx={{ display: 'flex', justifyContent: 'flex-end', gap: 1, mt: 2 }} onClick={e => e.stopPropagation()}>
+                <Box
+                  sx={{ display: 'flex', justifyContent: 'flex-end', gap: 1, mt: 2 }}
+                  onClick={e => e.stopPropagation()}
+                >
                   {actions(row)}
                 </Box>
               )}
@@ -181,7 +191,11 @@ const DataTable = <T,>({
               {columns.map(c => (
                 <TableCell key={c.key} align={c.align} sortDirection={sort?.key === c.key ? sort.dir : false}>
                   {c.sortable ? (
-                    <TableSortLabel active={sort?.key === c.key} direction={sort?.key === c.key ? sort.dir : 'asc'} onClick={() => toggleSort(c.key)}>
+                    <TableSortLabel
+                      active={sort?.key === c.key}
+                      direction={sort?.key === c.key ? sort.dir : 'asc'}
+                      onClick={() => toggleSort(c.key)}
+                    >
                       {c.label}
                     </TableSortLabel>
                   ) : (
@@ -206,7 +220,12 @@ const DataTable = <T,>({
                   </TableCell>
                 ))}
                 {actions && (
-                  <TableCell align='right' className='no-print' onClick={e => e.stopPropagation()} sx={{ whiteSpace: 'nowrap' }}>
+                  <TableCell
+                    align='right'
+                    className='no-print'
+                    onClick={e => e.stopPropagation()}
+                    sx={{ whiteSpace: 'nowrap' }}
+                  >
                     {actions(row)}
                   </TableCell>
                 )}

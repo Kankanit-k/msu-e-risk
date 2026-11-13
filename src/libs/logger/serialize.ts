@@ -81,8 +81,7 @@ export const serializeError = (error: unknown): SerializedError => {
   return { name: 'Error', message: String(error) }
 }
 
-export const sanitizeContext = (context?: LogContext) =>
-  context ? (sanitize(context) as LogContext) : undefined
+export const sanitizeContext = (context?: LogContext) => (context ? (sanitize(context) as LogContext) : undefined)
 
 /** YYYY-MM-DD in the configured timezone — this is what names the day's file. */
 export const dateStamp = (date = new Date()) =>

@@ -29,30 +29,31 @@ type LogoTextProps = {
 const LogoText = styled.div<LogoTextProps>`
   display: flex;
   flex-direction: column;
-  min-width: 0;
+  min-inline-size: 0;
+  overflow: hidden;
   transition: ${({ transitionDuration }) =>
     `margin-inline-start ${transitionDuration}ms ease-in-out, opacity ${transitionDuration}ms ease-in-out`};
 
   ${({ isHovered, isCollapsed, isBreakpointReached }) =>
     !isBreakpointReached && isCollapsed && !isHovered
       ? 'opacity: 0; margin-inline-start: 0;'
-      : 'opacity: 1; margin-inline-start: 10px;'}
+      : 'opacity: 1; margin-inline-start: 8px;'}
 `
 
 const LogoOverline = styled.span`
   color: var(--mui-palette-text-secondary);
-  font-size: 0.625rem;
+  font-size: 0.475rem;
   line-height: 1.3;
   font-weight: 600;
-  letter-spacing: 0.06em;
+  letter-spacing: 0;
   text-transform: uppercase;
   white-space: nowrap;
 `
 
 const LogoTitle = styled.span<{ color?: CSSProperties['color'] }>`
   color: ${({ color }) => color ?? 'var(--mui-palette-text-primary)'};
-  font-family: var(--font-heading-latin), var(--font-heading-thai), 'Manrope', 'IBM Plex Sans Thai', sans-serif;
-  font-size: 1.375rem;
+  font-family: var(--font-main), 'Mornamchi', sans-serif;
+  font-size: 1.0625rem;
   line-height: 1.2;
   font-weight: 800;
   letter-spacing: -0.02em;
@@ -61,7 +62,7 @@ const LogoTitle = styled.span<{ color?: CSSProperties['color'] }>`
 
 const LogoSubtitle = styled.span`
   color: var(--mui-palette-text-secondary);
-  font-size: 0.75rem;
+  font-size: 0.625rem;
   line-height: 1.4;
   font-weight: 500;
   white-space: nowrap;
@@ -100,7 +101,7 @@ const Logo = ({ color }: { color?: CSSProperties['color'] }) => {
       <img
         src={`${process.env.NEXT_PUBLIC_BASEPATH ?? ''}/images/logos/msu-logo.png`}
         alt={themeConfig.templateName}
-        style={{ flexShrink: 0, objectFit: 'contain', blockSize: 22, inlineSize: 'auto' }}
+        style={{ flexShrink: 0, objectFit: 'contain', blockSize: 16, inlineSize: 'auto' }}
       />
       <LogoText
         ref={logoTextRef}

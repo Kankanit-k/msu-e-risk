@@ -10,8 +10,9 @@ import { resolveRoleForStaff } from '@/libs/roleResolver'
 // Path part of the app's basePath (NEXT_PUBLIC_BASEPATH may be a full URL, see libs/logger/client.ts).
 // Falls back to the basePath configured in next.config.ts, like ClientProviders does.
 const basePath =
-  (process.env.BASEPATH || process.env.NEXT_PUBLIC_BASEPATH || '').replace(/^https?:\/\/[^/]+/, '').replace(/\/$/, '') ||
-  '/digitalplan'
+  (process.env.BASEPATH || process.env.NEXT_PUBLIC_BASEPATH || '')
+    .replace(/^https?:\/\/[^/]+/, '')
+    .replace(/\/$/, '') || '/digitalplan'
 
 // Only these profile fields ever leave the server. The ERP profile also carries secrets
 // (SCOPES.twofa_secret, SCOPES.line_access_token) and the ERP access token — those must never

@@ -44,12 +44,18 @@ const cell = (ref: string, v: string | number | null | undefined) => {
   return `<c r="${ref}" t="inlineStr"><is><t xml:space="preserve">${esc(String(v))}</t></is></c>`
 }
 
-const sheetXml = <T,>(rows: T[], columns: XlsxColumn<T>[]) => {
-  const cols = columns.map((c, i) => `<col min="${i + 1}" max="${i + 1}" width="${c.width ?? 20}" customWidth="1"/>`).join('')
+const sheetXml = <T>(rows: T[], columns: XlsxColumn<T>[]) => {
+  const cols = columns
+    .map((c, i) => `<col min="${i + 1}" max="${i + 1}" width="${c.width ?? 20}" customWidth="1"/>`)
+    .join('')
+
   const header = `<row r="1">${columns.map((c, i) => cell(`${colName(i)}1`, c.label)).join('')}</row>`
 
   const body = rows
-    .map((row, r) => `<row r="${r + 2}">${columns.map((c, i) => cell(`${colName(i)}${r + 2}`, c.value(row))).join('')}</row>`)
+    .map(
+      (row, r) =>
+        `<row r="${r + 2}">${columns.map((c, i) => cell(`${colName(i)}${r + 2}`, c.value(row))).join('')}</row>`
+    )
     .join('')
 
   return (
@@ -168,14 +174,18 @@ export const zipStored = (entries: [string, string][]): Uint8Array => {
 }
 
 /** Build the .xlsx bytes (usable on the server too). */
-export const buildXLSX = <T,>(rows: T[], columns: XlsxColumn<T>[], sheetName = 'Sheet1') =>
+export const buildXLSX = <T>(rows: T[], columns: XlsxColumn<T>[], sheetName = 'Sheet1') =>
   zipStored(files(sheetXml(rows, columns), sheetName))
 
 /** Build and download an .xlsx in the browser. */
-export const downloadXLSX = <T,>(rows: T[], columns: XlsxColumn<T>[], filename: string) => {
+export const downloadXLSX = <T>(rows: T[], columns: XlsxColumn<T>[], filename: string) => {
   const name = filename.endsWith('.xlsx') ? filename : `${filename}.xlsx`
   const bytes = buildXLSX(rows, columns, name.replace(/\.xlsx$/, ''))
-  const blob = new Blob([bytes as BlobPart], { type: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet' })
+
+  const blob = new Blob([bytes as BlobPart], {
+    type: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet'
+  })
+
   const url = URL.createObjectURL(blob)
   const a = document.createElement('a')
 

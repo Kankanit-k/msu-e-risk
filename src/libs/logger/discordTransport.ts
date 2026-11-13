@@ -143,7 +143,11 @@ const buildPayload = (entry: LogEntry) => {
 
   if (entry.meta.hostname) fields.push({ name: 'Host', value: entry.meta.hostname, inline: true })
 
-  fields.push({ name: 'Time', value: `${localTime(new Date(entry.timestamp))} (${loggerConfig.timezone})`, inline: true })
+  fields.push({
+    name: 'Time',
+    value: `${localTime(new Date(entry.timestamp))} (${loggerConfig.timezone})`,
+    inline: true
+  })
 
   if (entry.error?.message) {
     fields.push({ name: 'Error', value: clamp(`**${entry.error.name}**: ${entry.error.message}`, 1024) })
@@ -176,13 +180,7 @@ const buildPayload = (entry: LogEntry) => {
   }
 }
 
-const post = async (
-  url: string,
-  key: string,
-  payload: unknown,
-  opensThread: boolean,
-  attempt = 0
-): Promise<void> => {
+const post = async (url: string, key: string, payload: unknown, opensThread: boolean, attempt = 0): Promise<void> => {
   try {
     const res = await fetch(url, {
       method: 'POST',

@@ -82,7 +82,10 @@ const isExpired = (iso: string, now: number) => Date.parse(iso) <= now
 // Drop anything that can no longer be used so the file stays small.
 const prune = (data: StoreData) => {
   const now = Date.now()
-  const liveGrantIds = new Set(data.grants.filter(g => !g.revokedAt && !isExpired(g.refreshExpiresAt, now)).map(g => g.id))
+
+  const liveGrantIds = new Set(
+    data.grants.filter(g => !g.revokedAt && !isExpired(g.refreshExpiresAt, now)).map(g => g.id)
+  )
 
   data.codes = data.codes.filter(c => !isExpired(c.expiresAt, now))
   data.accessTokens = data.accessTokens.filter(t => !isExpired(t.expiresAt, now) && liveGrantIds.has(t.grantId))
@@ -90,7 +93,9 @@ const prune = (data: StoreData) => {
   // Keep revoked/expired grants for 30 days so the connections page can show what happened.
   const keepUntil = now - 30 * 24 * 3600_000
 
-  data.grants = data.grants.filter(g => liveGrantIds.has(g.id) || Date.parse(g.revokedAt ?? g.refreshExpiresAt) > keepUntil)
+  data.grants = data.grants.filter(
+    g => liveGrantIds.has(g.id) || Date.parse(g.revokedAt ?? g.refreshExpiresAt) > keepUntil
+  )
   data.actions = data.actions.filter(a => Date.parse(a.expiresAt) > keepUntil)
 }
 

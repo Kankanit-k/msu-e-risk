@@ -51,7 +51,10 @@ export const runTool = async (
     return { status: 'denied', message: 'ไม่มี tool นี้ หรือคุณไม่มีสิทธิ์ใช้' }
   }
 
-  const parsed = z.object(tool.input).strict().safeParse(rawArgs ?? {})
+  const parsed = z
+    .object(tool.input)
+    .strict()
+    .safeParse(rawArgs ?? {})
 
   if (!parsed.success) {
     audit(caller, name, 'invalid', startedAt)
@@ -84,17 +87,28 @@ export const runTool = async (
     }
 
     const accepted = await getStore().update(d => {
-      if (d.actions.filter(a => a.userId === caller.userId && a.status === 'pending' && Date.parse(a.expiresAt) > Date.now()).length >= TTL.pendingActionsPerUser)
+      if (
+        d.actions.filter(
+          a => a.userId === caller.userId && a.status === 'pending' && Date.parse(a.expiresAt) > Date.now()
+        ).length >= TTL.pendingActionsPerUser
+      )
         return false
       d.actions.push(action)
 
       return true
     })
 
-    if (!accepted) return { status: 'denied', message: 'มีรายการรอยืนยันค้างอยู่มากเกินไป กรุณายืนยันหรือยกเลิกรายการเดิมก่อน' }
+    if (!accepted)
+      return { status: 'denied', message: 'มีรายการรอยืนยันค้างอยู่มากเกินไป กรุณายืนยันหรือยกเลิกรายการเดิมก่อน' }
     audit(caller, name, 'pending-confirmation', startedAt, { actionId: action.id })
 
-    return { status: 'confirm', actionId: action.id, preview, confirmUrl: actionUrl(action.id), expiresAt: action.expiresAt }
+    return {
+      status: 'confirm',
+      actionId: action.id,
+      preview,
+      confirmUrl: actionUrl(action.id),
+      expiresAt: action.expiresAt
+    }
   } catch (error) {
     logger.error(`mcp tool ${name} failed`, { source: 'mcp', error, context: { userId: caller.userId, tool: name } })
 
@@ -142,12 +156,22 @@ export const confirmAction = async (caller: Caller, id: string, decision: 'confi
 
     await getStore().update(d => void (d.actions.find(x => x.id === id)!.result = result))
     audit(caller, action.tool, 'executed', startedAt, { actionId: id, via: action.clientId })
-    await auditTrail({ actor: caller.userId, action: `mcp.${action.tool}`, target: id, after: { args: action.args, result } })
+    await auditTrail({
+      actor: caller.userId,
+      action: `mcp.${action.tool}`,
+      target: id,
+      after: { args: action.args, result }
+    })
 
     return { ok: true as const, result }
   } catch (error) {
     await getStore().update(d => void (d.actions.find(x => x.id === id)!.status = 'failed'))
-    await auditTrail({ actor: caller.userId, action: `mcp.${action.tool}.failed`, target: id, after: { args: action.args } })
+    await auditTrail({
+      actor: caller.userId,
+      action: `mcp.${action.tool}.failed`,
+      target: id,
+      after: { args: action.args }
+    })
     logger.error(`mcp action ${action.tool} failed`, { source: 'mcp', error, context: { actionId: id } })
 
     return { ok: false as const, message: 'ดำเนินการไม่สำเร็จ' }

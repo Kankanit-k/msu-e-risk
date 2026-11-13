@@ -18,7 +18,11 @@ export type Notice = {
   emailTo?: string[]
 }
 
-const list = (v?: string) => (v ?? '').split(',').map(s => s.trim()).filter(Boolean)
+const list = (v?: string) =>
+  (v ?? '')
+    .split(',')
+    .map(s => s.trim())
+    .filter(Boolean)
 
 const pushLine = async ({ subject, text, lineTo }: Notice) => {
   const token = process.env.LINE_CHANNEL_ACCESS_TOKEN
@@ -47,7 +51,10 @@ const sendEmail = async ({ subject, text, emailTo }: Notice) => {
 
   // Variable specifier keeps the bundler from requiring nodemailer when email is not used.
   const mod = 'nodemailer'
-  const nodemailer = (await import(/* webpackIgnore: true */ mod)) as { createTransport: (o: unknown) => { sendMail: (m: unknown) => Promise<unknown> } }
+
+  const nodemailer = (await import(/* webpackIgnore: true */ mod)) as {
+    createTransport: (o: unknown) => { sendMail: (m: unknown) => Promise<unknown> }
+  }
 
   const transport = nodemailer.createTransport({
     host,
@@ -64,7 +71,10 @@ export const notify = async (notice: Notice) => {
 
   results.forEach((r, i) => {
     if (r.status === 'rejected') {
-      logger.error('notification failed', { error: r.reason, context: { channel: i === 0 ? 'line' : 'email', subject: notice.subject } })
+      logger.error('notification failed', {
+        error: r.reason,
+        context: { channel: i === 0 ? 'line' : 'email', subject: notice.subject }
+      })
     }
   })
 }
